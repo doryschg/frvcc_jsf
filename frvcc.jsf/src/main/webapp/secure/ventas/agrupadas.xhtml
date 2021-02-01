@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateNoAuth.xhtml"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+	<!-- 	<f:metadata> -->
+	<!-- 				<f:viewAction action="{logedBean.check}" /> -->
+	<!-- 	</f:metadata> -->
+
+	<ui:define name="title">REGISTRO DE VENTAS - AGRUPADAS </ui:define>
+
+	<!-- CONTENT -->
+	<ui:define name="body">
+			<style type="text/css">
+				.ErrorImput{
+				     /* color:#FF0008;!important;*/
+				      background: #ff8585;
+				}
+				
+				.ui-fileupload-content{
+					display: none; 
+				}
+				
+		
+			</style>
+
+
+		<div class="ui-panel ui-widget ui-widget-content ui-corner-all">
+			<div class="ui-panel-content ui-widget-content">
+				<div
+					class="ui-panel ui-widget ui-widget-content ui-corner-all card box-primary ui-fluid">
+					<div
+						class="ui-panel-titlebar ui-widget-header ui-helper-clearfix ui-corner-all">
+						<span class="ui-panel-title">REGISTRO DE VENTAS - AGRUPADAS</span>
+					</div>
+
+					<div class="ui-panel-content ui-widget-content">
+						<!-- 	CONTENT-PAGE	 -->
+						<div class="content">
+							 
+							<!-- 		CARGA Y DESCARGA DE XLS 		-->
+							<h:form id="frmFile" enctype="multipart/form-data"  >
+								<div class="row">
+								
+									<div class="col-md-6 text-left">
+										<h:commandLink
+											actionListener="#{notasController.dwnldNotaExcel}"
+											styleClass="btn btn-success btn-sm" id="btnDownloadExcel">
+											<i class="fa fa-download"> </i>
+											<span>Descargar Plantilla Registro</span>
+											<p:fileDownload value="#{notasController.file}" />
+										</h:commandLink>
+										 
+									</div>
+									
+									
+									<div class="col-md-6 text-right">
+									
+										<p:fileUpload id="flUpldNota" 
+													  widgetVar="wgtVarflUpldNotas"
+													  label="Importar Excel" 
+													  skinSimple="true" 
+													  styleClass="btn btn-lg btn-outline-primary" 
+													  multiple="false"
+													  auto="true" 
+													  fileUploadListener="#{notasController.getFileData}"
+													  dragDropSupport="false"
+													  immediate="true"												  
+													  >
+<!-- 													  onstart="importFile(this);"	 -->
+												<p:inputText widgetVar="wVPaste" placeholder="Pegar aqui" style="text-align: center" />
+												
+										</p:fileUpload>
+									
+									</div>
+									
+								</div>
+							</h:form>
+
+							<br /> <br />
+							
+							<!-- 		CARGA INDIVIDUAL 		-->
+<!-- editMode="cell" editingRow="true" selection="#{sieteRgNotasController.slctdNota}" -->
+							<h:form id="frmNotas"  >
+												
+									
+								<p:dataTable 	id="dtNotas" 
+												emptyMessage="Sin registros"
+												widgetVar="dtWgtNota" 
+												var="nota" 
+												rowIndexVar="rowIndex" 
+												value="#{notasController.notas}"
+												styleClass="table table-striped table-borderedtable-hovertable-sm"
+												paginator="true"
+												paginatorPosition="bottom"
+												aginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+												currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} facturas"
+												rowsPerPageTemplate="20,30"
+												rows="20"
+												>
+									 									
+									<p:column headerText="Nº" style="width:auto; text-align: center">
+										<p:outputLabel value="#{rowIndex eq 0?'':rowIndex }" style="width:100%" />
+									</p:column>
+									
+									<p:column headerText="Fecha" style="width: auto; text-align: center" >
+									
+										<p:inputMask id="inTxtFch"
+													mask="99/99/9999"
+													value="#{nota.fchFactura}"
+													onkeydown="saveRow(event,'#{rowIndex}')"
+													onkeyup="validarFecha(this)"
+													/>
+										<p:tooltip id="_inTxtFch" for="inTxtFch" position="top" />
+
+									</p:column>
+									
+									<p:column headerText="N° de Factura de" style="width: auto; text-align: center" >
+										  
+									       <p:inputText	id="inTxtNroFacDsd" 
+									       				value="#{nota.nroFactura}"
+									                	onkeydown="saveRow(event,'#{rowIndex}')" 
+									                	onkeyup="validarFac(this)"
+									                	class="error"
+									                	/>
+									       <p:tooltip id="_inTxtNroFacDsd" for="inTxtNroFacDsd" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="N° de Factura hasta" style="width: auto; text-align: center" >
+										  
+									       <p:inputText	id="inTxtNroFacHst" 
+									       				value="#{nota.nroFactura}"
+									                	onkeydown="saveRow(event,'#{rowIndex}')" 
+									                	onkeyup="validarFac(this)"
+									                	class="error"
+									                	/>
+									       <p:tooltip id="_inTxtNroFacHst" for="inTxtNroFacHst" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="N° Autorizacion/CUF" style="width: auto; text-align: center">
+										
+									    	<p:inputText id="inTxtAut"
+									    				 value="#{nota.codAutorCuf}"
+									    				 onkeydown="saveRow(event,'#{rowIndex}')"
+									    				 onkeyup="validarNroAuto(this)"	  
+									    				 />
+									    	<p:tooltip id="_inTxtAut" for="inTxtAut" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Importe Total Facturas Agrupadas" style="width:auto; text-align: center">
+										
+									    	<p:inputNumber id="inNumTF"
+									    				   value="#{nota.imprtTotal}"
+									    				   onkeydown="saveRow(event,'#{rowIndex}')" 
+									    				   maxValue="999999999999999.99"
+									    				   decimalPlaces="2"
+														   thousandSeparator="," 
+														   decimalSeparator="." 
+														   onkeyup="validarItf(this)"
+														   >
+<!-- 									    			<p:ajax listener="#{sieteRgNotasController.calcImporteBase(Nota)}" update="inNumSt inNumIbdf" global="false" /> -->
+								
+											</p:inputNumber>
+											<p:tooltip id="_inNumTF_input" for="inNumTF" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Estado" style=" text-decoration-color: green; width: 5%; text-align: center">
+									    
+<!-- 									    	<p:inputText value="#{Nota.estado}" -->
+<!-- 									    			 	 onkeydown="saveRow(event,'#{rowIndex}')" -->
+									    	<p:selectOneMenu id="estado" value="#{nota.estado}" onkeydown="saveRow(event,'#{rowIndex}')">
+									            <f:selectItem itemLabel="Anulado" itemValue="AN" />
+									            <f:selectItem itemLabel="Vigente" itemValue="VIG" />
+									        </p:selectOneMenu>
+									 
+									    
+									</p:column>
+
+									<p:column headerText="Acciones" style="width: 6%; text-align: center">
+										<p:outputLabel rendered="#{rowIndex!=0}"
+													   styleClass="text-success" 
+													   style="align-content: center">
+											
+											<h:commandLink id="idDelete" 
+														   class=".text-success fa fa-trash" 
+														   value="" 
+														   action="#{NotasController.removerNota(Nota)}"/>
+											<p:tooltip for="idDelete" 
+													   position="top" 
+													   value="Eliminar Regisro" />
+										</p:outputLabel>
+		
+									</p:column>
+									
+									<p:column headerText="Guardar" style="display: none; width: auto; text-align: center">
+
+										<h:commandLink  id="btnGuardar"
+														styleClass="btn btn-default"
+														action="#{NotasController.guardarNota(Nota)}"
+													 	
+													 	>
+<!-- 											<f:ajax execute="@form" render="@none" /> -->
+										</h:commandLink>
+										
+									</p:column>
+									
+								</p:dataTable>
+
+
+
+							</h:form>
+
+						</div>
+
+
+
+
+
+						<!-- 	CONTENT-PAGE	 -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+<h:form id="frmRmtCmd">
+	<p:remoteCommand name="enviarFile" action="#{sieteRgNotasController.sendFileData}" />
+	<p:remoteCommand name="enviarRows" action="#{sieteRgNotasController.guardarRows}" />  
+												  
+</h:form>
+
+		 <h:outputScript library="primefaces" name="jquery/jquery.js" />
+		<h:outputScript library="js" name="compras/imask.js" />
+		<h:outputScript library="js" name="ajv.bundle.js" />
+		<h:outputScript library="js" name="ajv.min.js" />
+		<h:outputScript library="js" name="localize_es.js" target="head" />
+		<h:outputScript library="js" name="xlsx.full.min.js" />
+		<h:outputScript library="js" name="sieterg/validator.js" />
+		<!-- Componente con Funcionalidad copiar pegar  desde excel -->
+
+		<h:outputScript library="js" name="compras/DataGridRenderer.js" />
+		<h:outputScript library="js" name="sieterg/sieteRgNotas.js" />
+
+	</ui:define>
+</ui:composition>

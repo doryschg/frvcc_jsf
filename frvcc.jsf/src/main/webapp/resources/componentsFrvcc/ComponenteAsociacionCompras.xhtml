@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:w="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:ldc="http://example.com/LocalDateConverter">
+<!-- INTERFACE -->
+<composite:interface>
+	<composite:attribute name="listaComprasLazy" />
+	<composite:attribute name="ComponenteButtonLimpiar" required="false"
+		method-signature="void DefaultMetod()" />
+	<composite:attribute name="facturaAscSelect" />
+	<composite:attribute name="asociarAction"
+		method-signature="void Action()" />
+
+</composite:interface>
+
+<!-- IMPLEMENTATION -->
+<composite:implementation>
+
+
+	<p:panel id="facComprasPanel" styleClass="card box-primary ui-fluid">
+		<H4>Seleccione las facturas que desea adicionar al formulario</H4>
+		<p:dataTable var="factura" id="tblFacturas"
+			emptyMessage="No se encontraron compras para asociar" rowKey="#{factura.id}"
+			value="#{cc.attrs.listaComprasLazy}"
+			styleClass="table table-striped table-bordered table-hover table-sm"
+			widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="10"
+			paginator="true" paginatorPosition="bottom"
+			rowsPerPageTemplate="10,20,30,100,500" paginatorAlwaysVisible="false"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			currentPageReportTemplate="{totalRecords} registros"
+			selection="#{cc.attrs.facturaAscSelect}" toggleable="true"
+			sortBy="#{factura.fechaFactura}" sortOrder="ASCENDING">
+			<p:column headerText="N°" styleClass="ui-icon-table">
+				<p:outputLabel value="#{rowIndex+1}" />
+			</p:column>
+			<p:column headerText="NIT Proveedor" style="text-align: center"
+			sortBy="#{factura.nitProveedor}" filterBy="#{factura.nitProveedor}" filterMatchMode="contains" >
+				<h:outputText value="#{factura.nitProveedor}" style="float:right"/>
+			</p:column>
+			<p:column headerText="Razón Social" style="text-align: center">
+				<h:outputText value="#{factura.razonSocialProveedor}" />
+			</p:column>
+			<p:column headerText="N° de Factura" style="text-align: center">
+				<h:outputText value="#{factura.numeroFactura}" style="float:right"/>
+			</p:column>
+			<p:column headerText="N° Autorización/CUF" style="text-align: center">
+				<h:outputText value="#{factura.codigoAutorizacion}" style="float:right"/>
+			</p:column>
+			<p:column headerText="Fecha Emisión"
+			sortBy="#{factura.fechaFactura}">
+				<h:outputText value="#{factura.fechaFactura}" style="float:right">
+					<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Importe Total"
+			sortBy="#{factura.importeTotalCompra}">
+				<h:outputText value="#{factura.marcaEspecialId=='7RG'?factura.importeTotalCompra: factura.importeBaseCf}"
+					style="float:right">
+					<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Crédito Fiscal">
+				<h:outputText value="#{factura.creditoFiscal}" style="float:right">
+					<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Código de Control" style="text-align: center">
+				<h:outputText value="#{factura.codigoControl}">
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Tipo Factura" style="text-align: center"
+			sortBy="#{factura.marcaEspecialId}">
+				<h:outputText value="#{factura.modalidadId=='FEL' or factura.modalidadId=='FPW' 
+							or factura.modalidadId=='FCL'?'LIN ':''}" />
+				<h:outputText
+					value="#{factura.modalidadId=='ELE' or factura.modalidadId=='CIC'?'E ':''}" />
+				<h:outputText
+					value="#{factura.marcaEspecialId=='IPN' ?'PROD-NAL ':''}" />
+				<h:outputText value="#{factura.marcaEspecialId=='7RG' ?'7RG ':''}" />
+			</p:column>
+
+			<p:column selectionMode="multiple" style="text-align:center"
+				headerText="Seleccionar">
+				<!-- 						<p:selectBooleanCheckbox widgetVar="sbcRubro_#{factura.id}" -->
+				<!-- 							value="#{factura.ok}"> -->
+				<!-- 							<p:ajax update="@widgetVar(sbcRubro_#{factura.id}) " -->
+				<!-- 								listener="#{asociacionComprasController.seleccionarRubro(factura)}" /> -->
+				<!-- 						</p:selectBooleanCheckbox> -->
+			</p:column>
+		</p:dataTable>
+		
+		<p:panelGrid id="pnlgAsocNotas" columns="3"
+										columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+										layout="grid" styleClass="ui-panelgrid-blank">
+										<p:spacer />
+										<p:commandButton validateClient="true" value="Seleccionar"
+				action="#{cc.attrs.asociarAction}" icon="fa fa-check"
+				styleClass="btn  btn-primary btn-sm" process="@form @this"
+				update="@([id$=formPrincipalAsc]) @([id$=formPrincipal])"></p:commandButton>
+			<p:commandButton value="Cerrar" icon="fa fa-close"
+				oncomplete="PF('dlgAscCompras').hide();"
+				update="@([id$=formPrincipal])" styleClass="btn  btn-warning btn-sm"
+				process="@this"></p:commandButton>
+										</p:panelGrid>
+		</p:panel>
+
+</composite:implementation>
+</html>

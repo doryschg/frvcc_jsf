@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:adm="http://github.com/adminfaces"
+                template="/common/templateNoAuth.xhtml"
+                xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+                xmlns:ldc="http://example.com/LocalDateConverter"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+    <h:outputStylesheet library="css" name="misfacturas.css"/>
+    <f:metadata>
+        <f:viewAction action="#{logedBean.check}"/>
+        <f:viewAction action="#{registroCompraLargaController.init}"/>
+
+    </f:metadata>
+    <ui:define name="title">Registro de Compras</ui:define>
+    <ui:define name="body">
+
+    <h:outputLabel value="Hello, world"/>
+
+    <h:form id="frmMisCompras">
+        <p:dataTable id="tblMisCompras" value="#{registroCompraLargaController.compraLargaModel.compras}" var="compra"
+                     rowIndexVar="rowIndex">
+            <p:column headerText="N°">
+                <p:outputLabel styleClass="center" value="#{rowIndex+1}"/>
+            </p:column>
+
+            <p:column headerText="Id" visible="false">
+                <p:inputText value="#{compra.id}"/>
+            </p:column>
+            <p:column headerText="NIT Proveedor">
+                <p:inputText id="nitProveedor" value="#{compra.nitProveedor}"/>
+            </p:column>
+            <p:column headerText="N° de Factura">
+                <p:inputText id="numeroFactura" value="#{compra.numeroFactura}"/>
+            </p:column>
+            <p:column headerText="N° de Autorización">
+                <p:inputText id="codigoAutorizacion" value="#{compra.codigoAutorizacion}"/>
+            </p:column>
+            <p:column headerText="Fecha de Emisión">
+                <p:inputText value="#{compra.fechaFactura}"/>
+            </p:column>
+            <p:column headerText="Importe Total">
+                <p:inputText id="importeBaseCf" value="#{compra.importeBaseCf}"/>
+            </p:column>
+            <p:column headerText="Importe No Sujeto a Credito Fiscal">
+                <p:inputText id="importeNoSujetoCf" value="#{compra.importeNoSujetoCf}"/>
+            </p:column>
+            <p:column headerText="Descuentos, Bonificaciónes ">
+                <p:inputText id="descuento" value="#{compra.descuento}"/>
+            </p:column>
+            <p:column headerText="Codigo de Autorización">
+                <p:inputText id="codigoControl" value="#{compra.codigoControl}"/>
+            </p:column>
+            <p:column headerText="Tipo de Compra">
+                <p:inputText id="tipoCompraId" value="#{compra.tipoCompraId}"/>
+            </p:column>
+            <p:column headerText="Operación">
+
+                <h:commandLink  actionListener="#{registroCompraLargaController.guardar}">
+                    <span class="fa fa-save" title="Guardar"> </span>
+                    <f:attribute name="compra" value="#{compra}"/>
+                    <f:ajax  execute="tblMisCompras" render="tblMisCompras"></f:ajax>
+                </h:commandLink>
+            </p:column>
+        </p:dataTable>
+    </h:form>
+    </ui:define>
+</ui:composition>

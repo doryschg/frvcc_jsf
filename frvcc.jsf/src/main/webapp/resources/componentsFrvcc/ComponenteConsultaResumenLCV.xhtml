@@ -1,0 +1,166 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:w="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor">
+<!-- INTERFACE -->
+<composite:interface>
+	<composite:attribute name="ComponenteEsVisibleLimpiar" />
+	<composite:attribute name="ComponenteButtonLimpiar" required="false"
+		method-signature="void DefaultMetod()" />
+	<composite:attribute name="ComponenteNameUpdate" />
+</composite:interface>
+
+<!-- IMPLEMENTATION -->
+<composite:implementation>
+	<script type="text/javascript">
+		function abrirVisorReporte() {
+			if (document.getElementById('frmBusqueda:comBuscador:btnVisorPdf:btnVisorPdf') != undefined) {
+			document.getElementById('frmBusqueda:comBuscador:btnVisorPdf:btnVisorPdf').click();
+			}				
+		}	
+	</script>
+	<p:panel header="Búsqueda presentaciones LCV" toggleable="true" id="idConsultaResumenLCV"
+		styleClass="card box-primary ui-fluid">
+		<p:panelGrid id="pnlCriteriosConsultaLCV" columns="6"
+			columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2"
+			layout="grid" styleClass="ui-flui d">
+			<p:outputLabel value="Gestión: " />
+			<p:selectOneMenu
+				value="#{consultaResumenLCVController.gestion}"
+				id="txtGestionConsultaLCV">
+				<f:selectItems
+					value="#{of:createIntegerArray(of:formatDate(now,'yyyy'),of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2016))}" />
+			</p:selectOneMenu>
+			<p:outputLabel value="Periodo: " />
+			<p:selectOneMenu
+				value="#{componenteBusquedaComprasController.periodo}"
+				id="txtPeriodoConsultaLCV">
+				<f:selectItem itemValue="#{null}"
+					itemLabel="Seleccionar" />
+				<f:selectItem itemValue="1" itemLabel="ENERO" />
+				<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+				<f:selectItem itemValue="3" itemLabel="MARZO" />
+				<f:selectItem itemValue="4" itemLabel="ABRIL" />
+				<f:selectItem itemValue="5" itemLabel="MAYO" />
+				<f:selectItem itemValue="6" itemLabel="JUNIO" />
+				<f:selectItem itemValue="7" itemLabel="JULIO" />
+				<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+				<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+				<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+				<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+				<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+			</p:selectOneMenu>
+
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />			
+
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />			
+
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />			
+
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />	
+			
+			<p:spacer/><p:spacer/>
+			<p:commandButton id="idBuscar" value="Buscar" icon="fa fa-search"
+				styleClass="btn btn-primary btn-sm"
+				actionListener="#{consultaResumenLCVController.obtieneResumenLCV()}"
+				update="@([id$=idConsultaResumenLCV])"
+				process="@this txtGestionConsultaLCV txtPeriodoConsultaLCV ">
+			</p:commandButton>
+			<p:commandButton id="idLimpiar" value="Limpiar"
+				styleClass="btn btn-warning btn-sm" process="@this"
+				actionListener="#{consultaResumenLCVController.nuevaBusqueda()}"
+				update="pnlCriteriosConsultaLCV dtConsultaLCV ">
+<!-- 				update="pnlCriteriosConsultaLCV dtConsultaLCV pnlBotones"> -->
+			</p:commandButton>
+		</p:panelGrid>
+		<p:separator/>
+
+		<p:dataTable id="dtConsultaLCV" emptyMessage="Sin registros"
+			var="resp" rowIndexVar="rowIndex"
+			value="#{consultaResumenLCVController.listaConsultaResumenLCV}">
+
+			<p:column style="width:3%;text-align: center">
+				<f:facet name="header">
+					<h:outputText value="N°"></h:outputText>
+				</f:facet>
+				<h:outputText value="#{rowIndex+1}"></h:outputText>
+			</p:column>
+			
+			<p:column headerText="Mes" style="width:10%">
+				<h:outputText value="#{resp.descripcionMes}" style="float:right"/>
+			</p:column>
+			
+			<p:column headerText="Año" style="width:10%">
+				<h:outputText value="#{resp.anioPeriodo}" style="float:right" />
+			</p:column>
+
+			<p:column headerText="Total Compras"
+				style="width:10%; text-align: center">
+				<h:outputText value="#{resp.totalCompras}" style="float:right">
+					<f:convertNumber pattern="#0.00" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Total Ventas"
+				style="width:10%; text-align: center">
+				<h:outputText value="#{resp.totalVentas}" style="float:right">
+					<f:convertNumber pattern="#0.00" />
+				</h:outputText>
+			</p:column>
+			
+			<p:column headerText="Cantidad Compras" style="width:10%">
+				<h:outputText value="#{resp.cantidadCompras}" style="float:right"/>
+			</p:column>
+
+			<p:column headerText="Cantidad Ventas" style="width:10%">
+				<h:outputText value="#{resp.cantidadVentas}" style="float:right"/>
+			</p:column>
+			
+			<p:column headerText="Fecha Registro" style="width:10%">
+				<h:outputText value="#{resp.fechaRegistroSistema}">
+					<f:convertDateTime  type="both" pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+
+		</p:dataTable>
+
+<!-- 		<p:panelGrid id="pnlBotones" columns="6" -->
+<!-- 			columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2" -->
+<!-- 			layout="grid" styleClass="ui-fluid"> -->
+<!-- 			<p:spacer /> -->
+<!-- 			<p:spacer /> -->
+<!-- 			<p:spacer /> -->
+<!-- 			<p:spacer /> -->
+<!-- 			<p:spacer /> -->
+<!-- 			<p:commandButton ajax="false" title="Descargar" -->
+<!-- 				value="Descargar Consulta Excel" -->
+<!-- 				actionListener="#{componenteBusquedaComprasController.ExcelComprasConsultadas()}" -->
+<!-- 				icon="fa fa-fw fa-download" styleClass="btn btn-success" -->
+<!-- 				id="btnDownloadExcel">				 -->
+<!-- 				<p:fileDownload -->
+<!-- 					value="#{componenteBusquedaComprasController.download}" /> -->
+<!-- 			</p:commandButton> -->
+<!-- 		</p:panelGrid> -->
+
+	</p:panel>
+	<p:panel visible="false">
+		<visor:visorPdf nombreWidgetVar="idFormularioInscripcionDlg"
+			icon="fa  fa-print" esVisibleBoton="true"
+			archivoB64="#{componenteBusquedaComprasController.reportesController.respuestaBase64}"
+			id="btnVisorPdf">
+		</visor:visorPdf>
+	</p:panel>
+</composite:implementation>
+</html>

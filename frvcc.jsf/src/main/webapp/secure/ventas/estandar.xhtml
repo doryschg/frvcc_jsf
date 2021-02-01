@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateNoAuth.xhtml"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+	<!-- 	<f:metadata> -->
+	<!-- 				<f:viewAction action="{logedBean.check}" /> -->
+	<!-- 	</f:metadata> -->
+
+	<ui:define name="title">REGISTRO DE VENTAS</ui:define>
+
+	<!-- CONTENT -->
+	<ui:define name="body">
+			<style type="text/css">
+			
+				.disabled{
+				    opacity: 0.6;
+				    cursor: not-allowed;
+				    pointer-events: none;
+				}
+				.ErrorImput{
+				     /* color:#FF0008;!important;*/
+				      background: #ff8585;
+				}
+				
+				.ui-fileupload-content{
+					display: none; 
+				}
+				
+				input .error+ :after {
+				  content: "\f06a";
+				  font-family: 'Font Awesome 5 Pro';
+				  font-weight: 900;
+				  display: inline-block;
+				  width: 10px;
+				  height: 10px;
+				  color: #e74c3c;
+				  position: absolute;
+				  top: 32%;
+				  right: 10%;
+				}
+
+			</style>
+  	
+ 	
+		<div class="ui-panel ui-widget ui-widget-content ui-corner-all">
+			<div class="ui-panel-content ui-widget-content">
+				<div
+					class="ui-panel ui-widget ui-widget-content ui-corner-all card box-primary ui-fluid">
+					<div
+						class="ui-panel-titlebar ui-widget-header ui-helper-clearfix ui-corner-all">
+						<span class="ui-panel-title">Registro de Ventas</span>
+					</div>
+
+					<div class="ui-panel-content ui-widget-content">
+						<!-- 	CONTENT-PAGE	 -->
+						<div class="content">
+							 
+							<!-- 		CARGA Y DESCARGA DE XLS 		-->
+							<h:form id="frmFile" enctype="multipart/form-data"  >
+								<div class="row">
+								
+									<div class="col-md-6 text-left">
+										<h:commandLink
+											actionListener="#{estandarController.dwnldVentaExcel}"
+											styleClass="btn btn-success btn-sm" id="btnDownloadExcel">
+											<i class="fa fa-download"> </i>
+											<span>Descargar Plantilla Registro</span>
+											<p:fileDownload value="#{estandarController.file}" />
+										</h:commandLink>
+										 
+									</div>
+									
+									
+									<div class="col-md-6 text-right">
+									
+										<p:fileUpload id="flUpldVenta" 
+													  widgetVar="wgtVarflUpldVentas"
+													  label="Importar Excel" 
+													  skinSimple="true" 
+													  styleClass="btn btn-lg btn-outline-primary" 
+													  multiple="false"
+													  auto="true" 
+													  fileUploadListener="#{estandarController.getFileData}"
+													  dragDropSupport="false"
+													  onstart="importFile(this);"	
+													  immediate="true"												  
+													  >
+												<p:inputText widgetVar="wVPaste" placeholder="Pegar aqui" style="text-align: center" />
+												
+										</p:fileUpload>
+									
+									</div>
+									
+								</div>
+							</h:form>
+
+							<br /> <br />
+							
+							<!-- 		CARGA INDIVIDUAL 		-->
+<!-- editMode="cell" editingRow="true" selection="#{estandarController.slctdVenta}" -->
+							<h:form id="frmVentas"  >
+								<p:messages id="messages" autoUpdate="true" showDetail="true" closable="true"/>
+    								
+								<p:dataTable id="dtVentas" 
+											 emptyMessage="Sin registros"
+											 widgetVar="dtWgtVenta" 
+											 var="venta" 
+											 rowIndexVar="rowIndex" 
+											 value="#{estandarController.ventas}"
+											 styleClass="table table-striped table-borderedtable-hovertable-sm"
+											 paginator="true"
+											 paginatorPosition="bottom"
+											 aginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											 currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} facturas"
+											 rowsPerPageTemplate="20,30"
+											 rows="20"
+											 >
+												
+									<f:facet name="head">
+									
+									</f:facet>
+									 									
+									<p:column headerText="Nº" style="width:auto; text-align: center">
+										<p:outputLabel value="#{rowIndex eq 0?'':rowIndex }" style="width:100%" />
+									</p:column>
+									
+									<p:column headerText="Fecha Factura" style="width: auto; text-align: center" >
+									
+										<p:inputMask id="inTxtFch"
+													 mask="99/99/9999"
+													 value="#{venta.fchFactura}"
+													 onkeydown="saveRow(event,'#{rowIndex}')"
+													 onkeyup="validarFecha(this)"
+													 style="width:5vw"
+													/>
+										<p:tooltip id="_inTxtFch" for="inTxtFch" position="top" />
+
+									</p:column>
+									
+									<p:column headerText="N° de Factura" style="width: auto; text-align: center" >
+										  
+									       <p:inputText	id="inTxtNroFac" 
+									       				value="#{venta.nroFactura}"
+									                	onkeydown="saveRow(event,'#{rowIndex}')" 
+									                	onkeyup="validarFac(this)"
+									                	class="error"
+									                	/>
+									       <p:tooltip id="_inTxtNroFac" for="inTxtNroFac" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="N° Autorizacion/CUF" style="width: auto; text-align: center">
+										
+									    	<p:inputText id="inTxtAut"
+									    				 value="#{venta.codAutorCuf}"
+									    				 onkeydown="saveRow(event,'#{rowIndex}')"
+									    				 onkeyup="validarNroAuto(this)"	  
+									    				 />
+									    	<p:tooltip id="_inTxtAut" for="inTxtAut" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Estado" style=" text-decoration-color: green; width: 5%; text-align: center">
+
+									    	<p:selectOneMenu id="estado" value="#{venta.estado}" onkeydown="saveRow(event,'#{rowIndex}')">
+									            <f:selectItem itemLabel="Anulado" itemValue="AN" />
+									            <f:selectItem itemLabel="Vigente" itemValue="VIG" />
+									        </p:selectOneMenu>							 
+									    
+									</p:column>
+
+									<p:column headerText="Nit/CI Cliente" style="width: auto; text-align: center">
+										
+									    	<p:inputText id="inTxtNit"
+									    				 value="#{venta.nitCliente}"
+									    				 onkeydown="saveRow(event,'#{rowIndex}')"
+									    				 onkeyup="validarNit(this)" />
+									    	<p:tooltip id="_inTxtNit" for="inTxtNit" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Nombre/Razon Social" style="width: auto; text-align: center">
+										
+									    	<p:inputText id="inTxtNom"
+									    				 value="#{venta.razonSocial}"
+									    				 onkeydown="saveRow(event,'#{rowIndex}')"
+									    				 onkeyup="validarNombre(this)" />
+									    	<p:tooltip id="_inTxtNom" for="inTxtNom" position="top" />
+									</p:column>
+
+									<p:column headerText="Importe Total Factura" style="width:auto; text-align: center">
+										
+									    	<p:inputNumber id="inNumTF"
+									    				   value="#{venta.imprtTotal}"
+									    				   onkeydown="saveRow(event,'#{rowIndex}')" 
+									    				   maxValue="999999999999999.99"
+									    				   decimalPlaces="2"
+														   thousandSeparator="," 
+														   decimalSeparator="." 
+														   onkeyup="validarItf(this)"
+														   >
+								
+											</p:inputNumber>
+											<p:tooltip id="_inNumTF_input" for="inNumTF" position="top" />
+									    
+									</p:column>
+									
+ 									<p:column headerText="Importe ICE/IEHD/TASAS" style="width:auto; text-align: center" > 
+										
+									    	<p:inputNumber id="inNunIiit"
+									    				   value="#{venta.imprtTasas}"
+									    				   onkeydown="saveRow(event,'#{rowIndex}')" 
+									    				   maxValue="999999999999999.99" 
+									    				   decimalPlaces="2"
+														   thousandSeparator="," 
+														   decimalSeparator="." 
+														   minValue="0.00"
+														   onkeyup="validarItii(this)"
+														   >
+													
+											</p:inputNumber>
+											<p:tooltip id="_inNunIiit_input" for="inNunIiit" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Exportaciones y Operaciones Exentas" style="width:auto; text-align: center">
+										
+									    	<p:inputNumber id="inNunEoe"
+									    				   value="#{venta.imprtExntas}"
+									    				   onkeydown="saveRow(event,'#{rowIndex}')" 
+									    				   maxValue="999999999999999.99" 
+									    				   decimalPlaces="2"
+														   thousandSeparator="," 
+														   decimalSeparator="." 
+														   minValue="0.00"
+														   onkeyup="validarEoe(this)"
+														   >
+													
+											</p:inputNumber>
+											<p:tooltip id="_inNunEoe_input" for="inNunEoe" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Ventas Grabadas Tasa Cero" style="width:auto; text-align: center">
+										
+									    	<p:inputNumber id="inNumVgtc"
+									    				   value="#{venta.vntasTsaCero}"
+									    				   onkeydown="saveRow(event,'#{rowIndex}')" 
+									    				   maxValue="999999999999999.99" 
+									    				   decimalPlaces="2"
+														   thousandSeparator="," 
+														   decimalSeparator="." 
+														   minValue="0.00"
+														   onkeyup="validarVgtc(this)"
+														   > 
+													
+											</p:inputNumber>
+											<p:tooltip id="_inNumVgtc_input" for="inNumVgtc" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Sub Total" style="width:auto; text-align: center">
+										
+											<p:inputText id="inNumSt" 
+														 styleClass="disabled"
+									    				 value="#{venta.subTotal}"
+									    				 onkeydown="saveRow(event,'#{rowIndex}')"
+									    				 onkeyup="validarSt(this)"
+										    			 
+									    				 >
+												<f:convertNumber pattern="###,###,##0.00" locale="en" />
+									    	</p:inputText>
+											<p:tooltip id="_inNumSt" for="inNumSt" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Descuentos, Bonificaciones y Rebajas" style="width: auto; text-align: center" >
+										
+									    	<p:inputNumber id="inNumDbr"
+									    				   value="#{venta.descuento}"
+									    				   onkeydown="saveRow(event,'#{rowIndex}')" 
+									    				   maxValue="999999999999999.99" 
+									    				   decimalPlaces="2"
+														   thousandSeparator="," 
+														   decimalSeparator="." 
+														   minValue="0.00"
+														   onkeyup="validarDbr(this)"
+														   >
+													
+											</p:inputNumber>
+											<p:tooltip id="_inNumDbr_input" for="inNumDbr" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Importe Base Debito Fiscal" style="width: auto; text-align: center">
+										
+											<p:inputText id="inNumIbdf"
+														 styleClass="disabled"
+									    				 value="#{venta.imprtBaseDf}"
+									    				 onkeydown="saveRow(event,'#{rowIndex}')"
+									    				 onkeyup="validarIbdf(this)"
+									    				 >
+									    		<f:convertNumber pattern="###,###,##0.00" locale="en" />
+									    	</p:inputText>
+											<p:tooltip id="_inNumIbdf" for="inNumIbdf" position="top" />
+									    
+									</p:column>
+									
+									<p:column headerText="Debito Fiscal" style="width: auto; text-align: center">
+										
+									    	<p:inputNumber  id="inNumDebFis" 
+									    					value="#{venta.dbitoFiscal}"
+									    					onkeydown="saveRow(event,'#{rowIndex}')" 
+									    					maxValue="999999999999999.99" 
+									    					decimalPlaces="2"
+															thousandSeparator="," 
+															decimalSeparator="." 
+															minValue="0.00"
+															onkeyup="validarDf(this)"
+															>
+<!-- 									  			<p:ajax update="inNumDebFis" global="false" /> widgetVar="wvDf"-->
+									    	</p:inputNumber>
+									    	<p:tooltip id="_inNumDebFis_input" for="inNumDebFis" position="top" />
+									    
+									</p:column>
+
+									<p:column headerText="Codigo de Control" style="width: 6%; text-align: center">
+									
+											<p:inputText id="inTxtCodCon"
+														 minlength="11"
+														 maxlength="14" 
+														 style="width:100%; text-transform: uppercase; text-align:center;"
+														 styleClass="ui-fluid" 
+														 value="#{venta.codControl}"
+														 onkeydown="saveRow(event,'#{rowIndex}')"
+														 onkeyup="validarCodCont(this)"
+														 />
+											<p:tooltip id="_inTxtCodCon" for="inTxtCodCon" position="top" />
+										
+									</p:column>
+									<p:column headerText="Acciones" style="width: 20px; text-align: center">
+										<p:outputLabel rendered="#{rowIndex!=0}"
+													   styleClass="text-success" 
+													   style="align-content: center">
+											
+											<h:commandLink id="idDelete" 
+														   class=".text-success fa fa-trash" 
+														   value="" 
+														   action="#{estandarController.removerVenta(venta)}"/>
+											<p:tooltip for="idDelete" 
+													   position="top" 
+													   value="Eliminar Regisro" />
+										</p:outputLabel>
+		
+									</p:column>
+									
+									<p:column headerText="Guardar" style="display: none; width: auto; text-align: center">
+
+										<p:commandLink  id="btnGuardar"
+														styleClass="btn btn-default"
+														action="#{estandarController.guardarVenta(venta)}"
+													 	title="Guardar"
+													 	process="@this"
+													 	>
+<!-- 											<f:ajax execute="@form" render="@none" /> -->
+										</p:commandLink>
+										
+									</p:column>
+									
+								</p:dataTable>
+
+
+
+							</h:form>
+
+						</div>
+
+
+
+
+
+						<!-- 	CONTENT-PAGE	 -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+<h:form id="frmRmtCmd">
+	<p:remoteCommand name="enviarFile" action="#{estandarController.sendFileData}" />
+	<p:remoteCommand name="enviarRows" action="#{estandarController.guardarRows}" />  
+												  
+</h:form>
+
+		<h:outputScript library="primefaces" name="jquery/jquery.js" />
+		<h:outputScript library="js" name="compras/imask.js" />
+		<h:outputScript library="js" name="ajv.bundle.js" />
+		<h:outputScript library="js" name="ajv.min.js" />
+		<h:outputScript library="js" name="localize_es.js" target="head" />
+		<h:outputScript library="js" name="xlsx.full.min.js" />
+		<h:outputScript library="js" name="ventas/validator.js" />
+		<!-- Componente con Funcionalidad copiar pegar  desde excel -->
+
+<!-- 		<h:outputScript library="js" name="compras/DataGridRenderer.js" /> -->
+		<h:outputScript library="js" name="ventas/validatorEstandar.js" />
+		
+		<h:outputScript library="js" name="ventas/jsc.venta.js" />
+		<h:outputScript library="js" name="ventas/xlsxToJson.js" />
+
+	</ui:define>
+</ui:composition>

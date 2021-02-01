@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteConsolidacionAgente" printOrder="Horizontal" pageWidth="612" pageHeight="792" whenNoDataType="BlankPage" columnWidth="527" leftMargin="45" rightMargin="40" topMargin="40" bottomMargin="40" uuid="533d3403-7241-442d-bade-ed9b062b0722">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="base" isDefault="true" radius="1" fontName="Tahoma" fontSize="7"/>
+	<style name="titulo1" style="base" hTextAlign="Center" vTextAlign="Middle" fontSize="11" isBold="true"/>
+	<style name="titulo2" style="base" hTextAlign="Left" vTextAlign="Middle" fontSize="9" isBold="true">
+		<box leftPadding="2">
+			<pen lineWidth="0.25"/>
+		</box>
+	</style>
+	<style name="titulo3" style="base" hTextAlign="Left" vTextAlign="Middle" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="0.25"/>
+		</box>
+	</style>
+	<style name="celdaCabecera" style="base" fontSize="6" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<pen lineWidth="1.0" lineStyle="Solid"/>
+		<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+			<pen lineWidth="0.5"/>
+		</box>
+	</style>
+	<parameter name="logoPath" class="java.lang.String"/>
+	<parameter name="imgLogoPie" class="java.lang.String"/>
+	<parameter name="nitAgente" class="java.lang.Long"/>
+	<parameter name="fechaImpresion" class="java.lang.String"/>
+	<parameter name="razonSocialAgente" class="java.lang.String"/>
+	<parameter name="administracion" class="java.lang.String"/>
+	<parameter name="gestion" class="java.lang.Integer"/>
+	<parameter name="periodo" class="java.lang.String"/>
+	<parameter name="totalDeterminacionPagoCuentaCf" class="java.math.BigInteger"/>
+	<parameter name="totalPagoCuenta" class="java.math.BigInteger"/>
+	<parameter name="cantidadFormularios" class="java.lang.Long"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="direccionSucursal" class="java.lang.String"/>
+	<field name="departamentoSucursal" class="java.lang.String"/>
+	<field name="cantidadFormularios" class="java.lang.Long"/>
+	<field name="totalDeterminacionPagoCuenta" class="java.math.BigInteger"/>
+	<field name="totalPagoCuenta" class="java.math.BigInteger"/>
+	<variable name="variableNumero" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{variableNumero}==0?$V{variableNumero}+1:2]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="174" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image hAlign="Center" onErrorType="Blank">
+				<reportElement stretchType="RelativeToTallestObject" x="1" y="-31" width="499" height="90" uuid="6c611363-6e9c-4cc9-b9e9-0784386caa24">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{logoPath}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement style="titulo1" mode="Transparent" x="1" y="65" width="500" height="20" uuid="dbe95e46-68bb-4080-ac7d-9c1b836f4bc4"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[TOTALES DEL PERIODO]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="base" x="480" y="95" width="48" height="15" uuid="13a8c8ac-6b72-417b-9d6b-b1097eb53f7d"/>
+				<box leftPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fechaImpresion}==null?"":$P{fechaImpresion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="1" y="95" width="100" height="15" isPrintInFirstWholeBand="true" uuid="ac243954-2caf-4a81-bf22-557a70919328"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[NIT:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="1" y="112" width="100" height="15" isPrintInFirstWholeBand="true" uuid="7e08e5bb-86ec-4def-bf22-a697d26c7259"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[RAZÓN SOCIAL:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="1" y="127" width="100" height="15" isPrintInFirstWholeBand="true" uuid="ecaeab50-3547-4bb8-845c-d2a965b0a219"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[ADMINISTRACIÓN:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="1" y="142" width="100" height="15" isPrintInFirstWholeBand="true" uuid="bb76a5c6-6d5e-4546-8975-1d9ee8c4051a"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[PERIODO:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Opaque" x="1" y="158" width="100" height="15" isPrintInFirstWholeBand="true" uuid="54dcd0ce-9466-4be4-bc5b-fd13222c71fe"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[GESTIÓN:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="base" x="103" y="112" width="424" height="15" uuid="8ede5c84-48d9-43aa-9b04-7556f40a701d"/>
+				<box leftPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{razonSocialAgente}==null?"":$P{razonSocialAgente}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="base" x="103" y="127" width="424" height="15" uuid="96b7e9dc-d016-4802-88c6-9a2710dc9da3"/>
+				<box leftPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{administracion}==null?"":$P{administracion}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="base" x="103" y="142" width="424" height="15" uuid="89697f6e-0126-49a0-bed6-7d447c989174"/>
+				<box leftPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{periodo}==null?"":$P{periodo}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="base" x="103" y="158" width="397" height="15" uuid="ae1b5afa-6516-49ec-8988-e52a5207032c"/>
+				<box leftPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{gestion}==null?"":$P{gestion}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="base" x="103" y="95" width="247" height="15" uuid="74a549d3-971e-426c-9744-a691e5962f40"/>
+				<box leftPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nitAgente}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="380" y="95" width="98" height="15" uuid="ffe6945f-3400-4362-967b-117920dc3458"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[FECHA DE IMPRESIÓN:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="95" width="529" height="79" uuid="d2cb6f79-0ae2-4f4e-a9bc-2cdc18c06cce"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement x="101" y="95" width="1" height="79" isRemoveLineWhenBlank="true" uuid="724f58e7-8f11-447f-92f7-3690bc3feb7f"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="380" y="95" width="1" height="16" isRemoveLineWhenBlank="true" uuid="7c2ba86f-16e5-4156-b48b-e39f06c316a9"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="110" width="529" height="1" isRemoveLineWhenBlank="true" uuid="fd901cca-000c-44e7-bade-6c91f53dc384"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="127" width="529" height="1" isRemoveLineWhenBlank="true" uuid="955635b7-bf19-4816-8e09-4610edd423a5"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="142" width="529" height="1" isRemoveLineWhenBlank="true" uuid="d12c8363-9d65-4130-8e63-86d92a5405a0"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="157" width="529" height="1" isRemoveLineWhenBlank="true" uuid="40c44940-ebb5-48ab-a398-594c5751b92b"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="33">
+			<rectangle>
+				<reportElement x="0" y="3" width="529" height="30" uuid="6687fc10-955c-47f8-b50a-857212914f0a"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="443" y="2" width="85" height="30" isPrintInFirstWholeBand="true" uuid="076fa251-675b-494c-801e-19153e7d23ff"/>
+				<box padding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" size="7" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[TOTAL PAGO A CUENTA POR FACTURAS SIETE RG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="357" y="2" width="85" height="30" isPrintInFirstWholeBand="true" uuid="7b6bf285-7bde-452e-8f81-6401cacd1f3c"/>
+				<box padding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" size="7" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[TOTAL DETERMINACIÓN DEL PAGO A CUENTA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="271" y="2" width="85" height="30" isPrintInFirstWholeBand="true" uuid="1aa9f5e5-049e-42cf-9b06-692f49fe71c8"/>
+				<box padding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" size="7" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[CANTIDAD DE F-110 V.4 ACEPTADOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="1" y="2" width="75" height="30" uuid="200903fd-fef8-4438-b2d4-b5536d0b5b1a"/>
+				<box padding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" size="7" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[DEPARTAMENTO]]></text>
+			</staticText>
+			<line>
+				<reportElement x="442" y="3" width="1" height="30" isRemoveLineWhenBlank="true" uuid="22ac4829-de70-4f83-ae5d-895d2c7daed9"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="356" y="3" width="1" height="30" isRemoveLineWhenBlank="true" uuid="9c8fe5e7-2616-408a-b22a-2901260e7d31"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="76" y="3" width="1" height="30" isRemoveLineWhenBlank="true" uuid="b5bf05fd-609f-4647-a4f1-227c86ce3efd"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="77" y="3" width="193" height="30" uuid="520097e7-627a-4cdf-9091-e59c12fb63ad"/>
+				<box padding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" size="7" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[DIRECCION SUCURSAL]]></text>
+			</staticText>
+			<line>
+				<reportElement x="270" y="3" width="1" height="30" isRemoveLineWhenBlank="true" uuid="af39ecd2-d4eb-4c22-a5b0-be917b407e39"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement positionType="FixRelativeToBottom" mode="Transparent" x="0" y="0" width="529" height="30" uuid="3d490eb0-c0fa-482d-b708-ce1f1d75fc1e"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement x="270" y="0" width="1" height="30" uuid="6aeaad40-52f5-4145-abd9-245a81fa9546"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="356" y="0" width="1" height="30" uuid="a7208811-626f-40fa-bc61-31ae5858f7ca"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="442" y="0" width="1" height="30" uuid="be898899-3849-4bff-bdd7-72e22c3495a9"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="base" x="271" y="0" width="85" height="30" uuid="690fac83-064b-4aed-ab8c-ee1a901282f4"/>
+				<box padding="1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cantidadFormularios}==null?0:$F{cantidadFormularios}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="base" x="357" y="0" width="85" height="30" uuid="b741eef0-a21f-467e-99f2-b82682060113"/>
+				<box padding="1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalDeterminacionPagoCuenta}==null?0:$F{totalDeterminacionPagoCuenta}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="base" x="443" y="0" width="85" height="30" isPrintInFirstWholeBand="true" uuid="5cb6fa31-0506-468c-a791-bb65ec4b6d94"/>
+				<box padding="1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalPagoCuenta}==null?0:$F{totalPagoCuenta}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="base" x="1" y="0" width="75" height="30" isRemoveLineWhenBlank="true" uuid="d8a8db8e-0b6c-4ebf-a15c-8083a8322a86"/>
+				<box padding="1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{departamentoSucursal}==null?"":$F{departamentoSucursal}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="base" x="76" y="0" width="194" height="30" uuid="0387ac11-81e5-4469-b568-b9c535a78266"/>
+				<box padding="1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+					<paragraph lineSpacingSize="1.0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{direccionSucursal}==null?"":$F{direccionSucursal}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="76" y="0" width="1" height="30" uuid="87b4045b-445e-496c-994a-d4b6f748d083"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="12">
+			<textField>
+				<reportElement x="216" y="2" width="290" height="10" isRemoveLineWhenBlank="true" uuid="56bb959d-16ce-4793-a2c7-dc094db2f847"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="508" y="2" width="21" height="10" isRemoveLineWhenBlank="true" uuid="f5e3726b-87c4-4c03-8b2a-1a0b9252167b"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==$V{PAGE_NUMBER}]]></printWhenExpression>
+			<rectangle>
+				<reportElement positionType="FixRelativeToBottom" mode="Transparent" x="0" y="0" width="529" height="20" uuid="97110115-1a92-43d2-b906-6964d2b12089"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</graphicElement>
+			</rectangle>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="base" isPrintRepeatedValues="false" x="271" y="0" width="85" height="20" isRemoveLineWhenBlank="true" uuid="bbd089de-d137-4bc4-9a3a-3ccb50cbf4e3"/>
+				<box padding="1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{cantidadFormularios}==null?"0":$P{cantidadFormularios}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="base" isPrintRepeatedValues="false" x="357" y="0" width="85" height="20" uuid="ecc6f0bf-7ba8-46a9-91d7-c0d68c9839ee"/>
+				<box padding="1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalDeterminacionPagoCuentaCf}==null?0:$P{totalDeterminacionPagoCuentaCf}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="base" isPrintRepeatedValues="false" x="443" y="0" width="85" height="20" isPrintInFirstWholeBand="true" uuid="2823deec-6d8a-4661-94f9-4e37d3704ea8"/>
+				<box padding="1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalPagoCuenta}==null?0:$P{totalPagoCuenta}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="base" mode="Transparent" x="1" y="0" width="75" height="20" uuid="5906dc47-7c3f-4510-87a7-8523e5c930fc"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Tahoma" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<line>
+				<reportElement x="442" y="0" width="1" height="20" isRemoveLineWhenBlank="true" uuid="12ca5737-3890-477e-8401-5bbcac31401b"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="356" y="0" width="1" height="20" isRemoveLineWhenBlank="true" uuid="32bb34b0-900c-4369-b971-05acba50698b"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="270" y="0" width="1" height="20" isRemoveLineWhenBlank="true" uuid="23aa1a9e-324e-440f-a52c-757c10e6b58d"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="76" y="0" width="1" height="20" isRemoveLineWhenBlank="true" uuid="1d770540-e192-4b44-889c-fe4b3fc4460d"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

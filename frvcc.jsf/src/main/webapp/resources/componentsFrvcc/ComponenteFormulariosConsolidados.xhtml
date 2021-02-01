@@ -1,0 +1,175 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor"
+	  xmlns:of="http://omnifaces.org/functions">
+<!-- INTERFACE -->
+<composite:interface>
+	<composite:attribute name="ComponenteEsVisibleLimpiar" />
+	<composite:attribute name="ComponenteButtonLimpiar" required="false"
+		method-signature="void DefaultMetod()" />
+	<composite:attribute name="ComponenteNameUpdate" />
+</composite:interface>
+
+<!-- IMPLEMENTATION -->
+<composite:implementation>
+	<h:form id="formPrincipalConsolidacion">
+		<p:panel header="Formularios Totalizados" toggleable="true"
+			id="idBusqueda" styleClass="card box-primary">
+			<p:panelGrid id="pnlCriterios" columns="4"
+						 columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+						 layout="grid" styleClass="ui-fluid">
+				<p:outputLabel value="Periodo Año:" />
+				<p:row>
+				<p:selectOneMenu required="true" requiredMessage="Dato requerido"
+					value="#{componenteFormsConsolidadosController.periodoAnio}"
+					id="txtPeriodoAnio">
+					<f:selectItems
+						value="#{of:createIntegerArray(of:formatDate(now,'yyyy')+1,of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+					<p:ajax id="idBuscar" listener="#{componenteFormsConsolidadosController.onBuscar}"
+							update="@([id$=idBusqueda]) btnVisorPdf" process="@this txtPeriodo txtPeriodoAnio"></p:ajax>
+				</p:selectOneMenu>
+				<p:message for="txtPeriodoAnio" />
+				</p:row>
+				<p:outputLabel value="Periodo Mes: " />
+				<p:row>
+				<p:selectOneMenu
+					value="#{componenteFormsConsolidadosController.periodoMes}"
+					id="txtPeriodo"  required="true" requiredMessage="Dato requerido">
+					<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+					<f:selectItem itemValue="1" itemLabel="ENERO" />
+					<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+					<f:selectItem itemValue="3" itemLabel="MARZO" />
+					<f:selectItem itemValue="4" itemLabel="ABRIL" />
+					<f:selectItem itemValue="5" itemLabel="MAYO" />
+					<f:selectItem itemValue="6" itemLabel="JUNIO" />
+					<f:selectItem itemValue="7" itemLabel="JULIO" />
+					<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+					<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+					<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+					<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+					<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+					<!--<p:clientValidator event="change" />-->
+					<p:ajax id="idBuscar" listener="#{componenteFormsConsolidadosController.onBuscar}"
+							update="@([id$=idBusqueda]) btnVisorPdf" process="@this txtPeriodo txtPeriodoAnio"></p:ajax>
+				</p:selectOneMenu>
+					<p:message for="txtPeriodo" />
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="idBotones" columns="2"
+						 columnClasses="ui-grid-col-10,ui-grid-col-2"
+						 layout="grid" styleClass="ui-fluid" >
+				<p:spacer/>
+				<!--<p:commandButton id="idBuscar" value="Buscar" icon="fa fa-search"
+					styleClass="btn btn-primary btn-sm"
+					actionListener="#{componenteFormsConsolidadosController.onBuscar}"
+					update="@([id$=idBusqueda]) btnVisorPdf"
+					process="@this txtPeriodo txtPeriodoAnio">
+				</p:commandButton>-->
+				<p:commandButton id="idLimpiar" value="Limpiar"
+					styleClass="btn btn-warning btn-sm" process="@this"
+					actionListener="#{componenteFormsConsolidadosController.onLimpiar}"
+					update="pnlCriterios dtFormularios pnlBotones" />
+			</p:panelGrid>
+
+			<p:separator />
+
+			<p:dataTable id="dtFormularios" emptyMessage="Sin registros"
+				var="formulario" paginator="true" lazy="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="{totalRecords} registros"
+				rowsPerPageTemplate="20,50,100" rowIndexVar="rowIndex" rows="20"
+				paginatorPosition="bottom" rowKey="#{formulario.id}"
+				value="#{componenteFormsConsolidadosController.formulariosLazy}"
+				styleClass="table table-striped table-borderedtable-hovertable-sm"
+				rowSelectMode="checkbox">
+				<p:column style="width:2%;text-align: center">
+					<f:facet name="header">
+						<h:outputText value="N°."></h:outputText>
+					</f:facet>
+					<h:outputText value="#{rowIndex+1}"></h:outputText>
+				</p:column>
+				<p:column headerText="Periodo" style="width:10%">
+					<h:outputText value="0"  rendered="#{!(formulario.mesPeriodo >= 10)}"/>
+					<h:outputText value="#{formulario.mesPeriodo}" />
+					<h:outputText value="/#{formulario.anioPeriodo}" />
+				</p:column>
+				<!--<p:column headerText="Usuario Receptor" style="width:10%">
+					<h:outputText value="#{formulario.nombreReceptor}" style="float:right"/>
+				</p:column>-->
+				<p:column headerText="N° Orden" style="width:10%">
+					<h:outputText value="#{formulario.numeroOrden}" style="float:right"/>
+				</p:column>
+				<p:column headerText="CI Dependiente" style="width:10%">
+					<h:outputText value="#{formulario.nitCi}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Cod. Dependiente" style="width:10%">
+					<h:outputText value="#{formulario.codigoDependiente}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Nombres y Apellidos" style="width:30%">
+					<h:outputText value="#{formulario.razonSocial}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Cant. de Facturas Prod. Nal."
+					style="width:10%">
+					<h:outputText value="#{formulario.cantidadComprasCfIpn}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Cant. Otras Facturas" style="width:10%">
+					<h:outputText value="#{formulario.cantidadComprasCfOtras}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Cant. Facturas SIETE-RG" style="width:10%">
+					<h:outputText value="#{formulario.cantidadComprasSdCf}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Total Importe Facturas Prod. Nal"
+					style="width:10%">
+					<h:outputText value="#{formulario.totalComprasCfIpnRed}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Total Importe Otras Facturas"
+					style="width:10%">
+					<h:outputText value="#{formulario.totalComprasCfOtrasRed}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Total Importe Facturas SIETE-RG"
+					style="width:10%">
+					<h:outputText value="#{formulario.totalComprasSdCfRed}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Determinación de Pago a Cuenta"
+					style="width:10%; text-align: center">
+					<h:outputText value="#{formulario.determinacionPagoCfRed}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Pago a Cuenta Facturas SIETE-RG"
+					style="width:10%; text-align: center">
+					<h:outputText value="#{formulario.determinacionPagoSdCfRed}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+			</p:dataTable>
+			<p:panelGrid id="pnlBotones" columns="4"
+				columnClasses="ui-grid-col-10,ui-grid-col-2"
+				layout="grid" styleClass="ui-fluid">
+				<p:spacer />
+				<visor:visorPdf esVisibleBoton="true" id="btnVisorPdf"
+					rendered="#{componenteFormsConsolidadosController.formularios.size()>0}"
+					nombreWidgetVar="idFormularioInscripcionDlg"
+					txtButtonAccion="Imprimir Totalizados" icon="fa  fa-print"
+					styleClass="btn btn-danger btn-sm"
+					archivoB64="#{componenteFormsConsolidadosController.reportesController.respuestaBase64}"
+					txtTitulo="Reporte Totalizados">
+				</visor:visorPdf>
+
+			</p:panelGrid>
+		</p:panel>
+	</h:form>
+
+</composite:implementation>
+</html>

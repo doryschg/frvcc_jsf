@@ -1,0 +1,1113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateAuth.xhtml"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor">
+
+	<style type="text/css">
+.column {
+	font-weight: bold;
+}
+</style>
+
+	<f:metadata>
+		<f:viewAction action="#{logedBean.check}" />
+	</f:metadata>
+
+	<ui:define name="title">
+       FORMULARIO 110
+    </ui:define>
+
+
+	<ui:define name="body">
+
+		<script type="text/javascript">
+		function controlClick(id) {
+		$("button[id$='"+id+"']").click();
+		} 
+	 </script>
+
+		<script type="text/javascript">
+		function abrirVisorReporte() {
+			if (document.getElementById('formPrincipal:btnVisorPdf:btnVisorPdf') != undefined) {
+			document.getElementById('formPrincipal:btnVisorPdf:btnVisorPdf').click();
+			}				
+		}	
+		</script>
+		<script type="text/javascript">
+  window.addEventListener('beforeunload', function(e) {
+		
+		  var element = document.getElementById('formPrincipal:btnGuardar');
+	  console.log(element);
+	  if(element) {
+		delete e['returnValue'];	  
+	    //following two lines will cause the browser to ask the user if they
+	    //want to leave. The text of this dialog is controlled by the browser.
+	    //e.preventDefault(); //per the standard
+	    e.returnValue = 'Ha intentado salir de esta pagina. Si ha realizado algun cambio en los campos sin hacer clic en el boton Guardar, los cambios se perderan. Seguro que desea salir de esta pagina?'; //required for Chrome
+	  }
+	  //else: user is allowed to leave without a warning dialog
+	});
+</script>
+		<f:event type="preRenderView"
+			listener="#{menuLateralBean.actualizaMenuLateral()}" />
+		<h:form id="formPrincipal">
+			<p:panel id="pnlFormularios" styleClass="box-primary ui-fluid">
+				<p:panelGrid columns="5"
+					columnClasses="ui-grid-col-1,ui-grid-col-3,ui-grid-col-1, ui-grid-col-3,ui-grid-col-2"
+					layout="grid" styleClass="ui-panelgrid-blank">
+					<p:outputLabel value="Gestión: " />
+					<p:selectOneMenu value="#{formulario110Controller.anioPeriodo}"
+						id="cbAnio">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+							noSelectionOption="true" />
+						<f:selectItems
+							value="#{of:createIntegerArray(of:formatDate(now,'yyyy')+1,of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+						<p:ajax event="change" update="formPrincipal"
+							listener="#{formulario110Controller.cargarFormulariosPeriodoSeleccionado()}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Periodo: " />
+					<p:selectOneMenu value="#{formulario110Controller.mesPeriodo}"
+						id="cbMes">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+						<f:selectItem itemValue="1" itemLabel="ENERO" />
+						<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+						<f:selectItem itemValue="3" itemLabel="MARZO" />
+						<f:selectItem itemValue="4" itemLabel="ABRIL" />
+						<f:selectItem itemValue="5" itemLabel="MAYO" />
+						<f:selectItem itemValue="6" itemLabel="JUNIO" />
+						<f:selectItem itemValue="7" itemLabel="JULIO" />
+						<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+						<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+						<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+						<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+						<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+						<f:selectItem itemValue="13" itemLabel="TODOS" />
+						<p:ajax event="change" update="formPrincipal"
+							listener="#{formulario110Controller.cargarFormulariosPeriodoSeleccionado()}" />
+					</p:selectOneMenu>
+					<p:commandButton id="btnAgregarFormulario" value="Nuevo Formulario"
+						styleClass="btn  btn-success btn-sm"
+						style="float:center; width:100%;" process="@this"
+						oncomplete="PF('dlgAgregaFormulario').show();"
+						update="pnlFormularios" icon="fa fa-plus">
+						<p:ajax event="click" process="@this"
+							listener="#{formulario110Controller.nuevoFormulario()}" />
+					</p:commandButton>
+					<p:spacer />
+					<p:spacer />
+				</p:panelGrid>
+				<p:panel
+					rendered="#{!(formulario110Controller.vListaFormularios.size()>0)}">
+					<p:outputLabel
+						value="No se encontraron formularios generados para el periodo y año especificados." />
+				</p:panel>
+				<p:panel header="Formularios Generados" id="pnlFormReg"
+					rendered="#{(formulario110Controller.vListaFormularios.size()>0)}"
+					toggleable="true" styleClass="ui-fluid">
+					<p:panelGrid id="formulariosPeriodo" columns="4"
+						columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<c:forEach items="#{formulario110Controller.vListaFormularios}"
+							var="formulario">
+							<p:commandLink process="@this"
+								actionListener="#{formulario110Controller.cargarDetalleFormulario(formulario)}"
+								update="pnlDetalleFormulario formPrincipal"
+								title="Ver Detalle: #{formulario.nombreFormulario} &#10; #{formulario.nombreEmpleador}">
+								<div
+									class="info-box bg-#{(formulario.estadoFormularioId == 'REG') ? 'olive' :(formulario.estadoFormularioId == 'DEC') ? 'teal':(formulario.estadoFormularioId == 'ACP') ? 'green':'red'}">
+									<span class="info-box-icon"> <i class="fa fa-paperclip"></i>
+									</span>
+									<div class="info-box-content">
+										<span class="info-box-text">
+											#{formulario.nombreFormulario}</span> <span>IPN Bs: <p:outputLabel
+												value="#{formulario.totalComprasCfIpn}">
+												<f:convertNumber locale="en-US" pattern="#,##0" />
+											</p:outputLabel>
+										</span> - <span>OTRAS Bs: <p:outputLabel
+												value="#{formulario.totalComprasCfOtras}">
+												<f:convertNumber locale="en-US" pattern="#,##0" />
+											</p:outputLabel>
+										</span> - <span>7RG Bs: <p:outputLabel
+												value="#{formulario.totalComprasSdCf}">
+												<f:convertNumber locale="en-US" pattern="#,##0" />
+											</p:outputLabel>
+										</span> <span class="progress-description">
+											#{clasificadorController.descripcionEstadoFormularioByCodigo(formulario.estadoFormularioId)}
+										</span>
+
+									</div>
+								</div>
+							</p:commandLink>
+						</c:forEach>
+
+					</p:panelGrid>
+				</p:panel>
+
+			</p:panel>
+
+			<p:panel id="pnlDetalleFormulario"
+				rendered="#{formulario110Controller.verDetalle}"
+				styleClass="box-primary ui-fluid" toggleable="true">
+				<p:panel
+					header="#{formulario110Controller.formulario.nombreFormulario}"
+					toggleable="true" styleClass="ui-fluid" menuTitle="true">
+					<p:panelGrid id="pngDetalleForm" columns="2" layout="grid"
+						styleClass="ui-fluid">
+						<p:spacer rendered="#{formulario110Controller.formulario.estadoFormularioId=='REG' or formulario110Controller.formulario.estadoFormularioId=='RECH'}" />
+						<p:row rendered="#{formulario110Controller.formulario.estadoFormularioId=='REG' or formulario110Controller.formulario.estadoFormularioId=='RECH'}">	
+						<span style="float:right; color:#a4a3a3;" >Para EDITAR los datos haga DOBLE CLICK en el campo</span>
+						</p:row> 
+						<p:panelGrid id="datosDependiente" columns="2" columnClasses="ui-grid-col-5,ui-grid-col-7" 
+						layout="grid" styleClass="ui-fluid">
+							<f:facet name="header">
+       							<p:row> <p:outputLabel class="control-label" value="DATOS DEPENDIENTE:" /> </p:row>
+       						</f:facet>
+							<p:outputLabel class="control-label"
+										   value="Tipo Documento Identidad:" />
+							<p:row>
+								<p:inplace id="inplTipoDoc"
+										   editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+										   disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+										   saveLabel="Guardar" cancelLabel="Cancelar"
+										   label="#{formulario110Controller.formulario.datosEspecificos.descripcionTipoDocumento}">
+									<p:selectOneMenu id="tipoDoc"
+													 value="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento}"
+													 required="true" requiredMessage="Dato Requerido"
+													 disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}">
+
+										<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+													  noSelectionOption="true" />
+										<f:selectItems
+												value="#{formulario110Controller.listaTipoDocumento}"
+												var="doc" itemLabel="#{doc.descripcion}"
+												itemValue="#{doc.codigoClasificador}" />
+										<p:clientValidator event="change" />
+									</p:selectOneMenu>
+									<p:ajax event="save"
+											listener="#{formulario110Controller.cambiarTipoDocumentoLugarExp}"
+											update="formPrincipal" />
+								</p:inplace>
+								<p:message for="tipoDoc" />
+							</p:row>
+							<p:outputLabel class="control-label"
+								value="Número Documento Identidad:" />
+								<h:outputText id="nroDocumento"
+									value="#{formulario110Controller.formulario.datosEspecificos.numeroDocumento}" />
+                            <p:outputLabel class="control-label"
+                                           value="Complemento Documento:"
+										   rendered="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}"/>
+                            <p:row rendered="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}">
+                                <p:inplace id="inplAjaxComplemento"
+
+                                           editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+                                           disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+                                           saveLabel="Guardar" cancelLabel="Cancelar"
+                                           styleClass="ui-confirmdialog" style="text-transform:uppercase;"
+										   label="#{formulario110Controller.formulario.datosEspecificos.complementoDocumento==null or formulario110Controller.formulario.datosEspecificos.complementoDocumento==''
+										   or formulario110Controller.formulario.datosEspecificos.complementoDocumento==''?
+								'(N/C)':formulario110Controller.formulario.datosEspecificos.complementoDocumento}">
+                                    <p:inputText id="complementodocumento" style="text-transform:uppercase;"
+                                                 readonly="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+                                                 value="#{formulario110Controller.formulario.datosEspecificos.complementoDocumento}"
+                                                 maxlength="2">
+                                        <p:keyFilter regEx="/[a-z0-9_]/i"
+                                                     preventPaste="false" />
+                                        <p:clientValidator event="blur" />
+                                        <p:clientValidator event="keyup" />
+                                    </p:inputText>
+                                    <p:ajax event="save"
+                                            listener="#{formulario110Controller.modificarCamposFormulario()}"
+                                            update="formPrincipal" />
+                                </p:inplace>
+                                <p:message for="complementodocumento" />
+
+                            </p:row>
+							<p:outputLabel id="lblLugarExp" class="control-label"
+								value="Lugar de Expedición:"
+								rendered="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}" />
+							<p:row
+								rendered="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}">
+								<p:inplace id="inplLugarExp"
+									disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+									editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+									rendered="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}"
+									saveLabel="Guardar" cancelLabel="Cancelar"
+									label="#{formulario110Controller.formulario.datosEspecificos.descripcionLugarExpedicion==null?
+								'Seleccione Lugar Expedición':formulario110Controller.formulario.datosEspecificos.descripcionLugarExpedicion}">
+									<p:selectOneMenu id="lugarExp"
+										rendered="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}"
+										value="#{formulario110Controller.formulario.datosEspecificos.lugarExpedicion}"
+										required="#{formulario110Controller.formulario.datosEspecificos.tipoDocumento=='CI'}"
+										requiredMessage="Dato Requerido"
+										disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}">
+
+									<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+											noSelectionOption="true" />
+										<f:selectItems
+											value="#{formulario110Controller.listaDepartamentos}"
+											var="depto" itemLabel="#{depto.nombre}"
+											itemValue="#{depto.departamentoId}" />
+										<p:clientValidator event="change" />
+									</p:selectOneMenu>
+									<p:ajax event="save"
+										listener="#{formulario110Controller.cambiarTipoDocumentoLugarExp}"
+										update="formPrincipal" />
+								</p:inplace>
+								<p:message for="lugarExp" />
+							</p:row>
+							<p:outputLabel class="control-label" value="Nombre Dependiente:" />
+							<p:row>
+								<h:outputText id="nombreRazonsocial"
+									value="#{formulario110Controller.formulario.razonSocial}" />
+							</p:row>
+
+							<p:outputLabel class="control-label"
+								value="Dirección Dependiente:" />
+							<p:row>
+								<p:inplace id="inplAjaxDomicilio"
+									editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+									disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+									saveLabel="Guardar" cancelLabel="Cancelar"
+									styleClass="ui-confirmdialog" style="text-transform:uppercase;">
+									<p:inputText id="domicilio" style="text-transform:uppercase;"
+										readonly="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+										value="#{formulario110Controller.formulario.direccion}"
+										required="true" requiredMessage="Dato requerido">
+										<p:keyFilter regEx="/[A-Za-z ÑñáéíóúÁÉÍÓÚ.,-:0-9]/i"
+											preventPaste="false" />
+										<p:clientValidator event="blur" />
+										<p:clientValidator event="keyup" />
+									</p:inputText>
+									<p:ajax event="save"
+										listener="#{formulario110Controller.modificarCamposFormulario()}"
+										update="formPrincipal" />
+								</p:inplace>
+								<p:message for="domicilio" />
+							</p:row>
+
+						</p:panelGrid>
+
+						<p:panelGrid id="pndDatosAgente" columns="2" columnClasses="ui-grid-col-4,ui-grid-col-8"
+							layout="grid" styleClass="ui-fluid">
+							<f:facet name="header">
+       							<p:row> <p:outputLabel class="control-label" value="DATOS F-110:" /> </p:row>
+       						</f:facet>
+       						<p:outputLabel class="control-label" value="Lugar de Presentación:" />
+							<p:row>
+								<p:inplace id="inplAjaxlugar"
+									editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+									disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+									saveLabel="Guardar" cancelLabel="Cancelar"
+									label="#{formulario110Controller.formulario.datosEspecificos.departamentoDescripcion}">
+									<p:selectOneMenu id="lugar"
+										value="#{formulario110Controller.formulario.lugarDepartamento}"
+										required="true" requiredMessage="Dato requerido"
+										disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}">
+										<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" noSelectionOption="true" />
+										<f:selectItems
+											value="#{formulario110Controller.listaDepartamentos}"
+											var="depto" itemLabel="#{depto.nombre}"
+											itemValue="#{depto.departamentoId}" />
+									</p:selectOneMenu>
+									<p:ajax event="save"
+										listener="#{formulario110Controller.cambiarLugarPresentacion}"
+										update="formPrincipal inpDirecEmpleador direcEmpleador" />
+									<p:message for="lugar" />
+								</p:inplace>
+							</p:row>
+							<p:outputLabel class="control-label"
+								value="Fecha de Presentación:" />
+							<p:row>
+								<p:inplace event="dblclick" id="inplAjaxFechaPresentacion"
+									editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+									disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+									saveLabel="Guardar" cancelLabel="Cancelar"
+									styleClass="ui-fluid">
+									<p:ajax event="save" process="@this"
+										onstart="PF('dlgConfirmFecha').show();"
+										listener="#{formulario110Controller.salvarValores()}">
+
+									</p:ajax>
+									<p:inputMask id="txtFechaPresentacion" required="true"
+										value="#{formulario110Controller.formulario.fechaPresentacion}"
+										mask="99/99/9999" converterMessage="Formato incorrecto"
+										readonly="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}">
+										<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+									</p:inputMask>
+
+								</p:inplace>
+							</p:row>
+							<p:outputLabel id="lblTipoUso" class="control-label"
+										   value="Tipo Formulario:"/>
+							<p:row>
+								<p:inplace id="inpTipoUso"
+										   disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+										   editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+										   saveLabel="Guardar" cancelLabel="Cancelar"
+										   label="#{formulario110Controller.formulario.tipoUsoDescripcion}">
+									<p:selectOneMenu id="tipoUso" style="width:100%"
+													 value="#{formulario110Controller.formulario.tipoUsoId}"
+													 required="true" requiredMessage="Dato Requerido">
+										<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+													  noSelectionOption="true" />
+										<f:selectItems
+												value="#{formulario110Controller.listaTipoUso}" var="c"
+												itemLabel="#{c.descripcion}"
+												itemValue="#{c.codigoClasificador}" />
+										<p:clientValidator event="change" />
+									</p:selectOneMenu>
+									<p:ajax event="save"
+											listener="#{formulario110Controller.modificarTipoUso}"
+											update="formPrincipal" />
+								</p:inplace>
+								<p:message for="tipoUso" />
+							</p:row>
+       						<p:row> <p:outputLabel class="control-label" value="DATOS AGENTE DE RETENCION:" /></p:row>
+       						<p:spacer/>				
+							<p:outputLabel class="control-label" value="NIT Agente de Retención:" />
+							<h:outputText id="NitEmpleador" value="#{formulario110Controller.formulario.nitEmpleador}" />
+							<p:outputLabel class="control-label" value="Nombre o Razón Social:" />
+							<h:outputText id="razonSocial" value="#{formulario110Controller.formulario.nombreEmpleador}" />
+							<p:outputLabel class="control-label" value="Dirección Empleador:" />
+							<p:row>
+								<p:inplace id="inpDirecEmpleador"
+										   disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}"
+										   editor="#{formulario110Controller.formulario.estadoFormularioId == 'REG'
+								or formulario110Controller.formulario.estadoFormularioId == 'RECH'}"
+										   saveLabel="Guardar" cancelLabel="Cancelar"
+										   label="#{formulario110Controller.formulario.direccionEmpleador==null?
+								'Seleccione Sucursal':formulario110Controller.formulario.direccionEmpleador}">
+									<p:selectOneMenu id="direcEmpleador" style="width:100%"
+													 value="#{formulario110Controller.sucursalSeleccinado}"
+													 required="true"
+													 requiredMessage="Dato Requerido"
+													 filter="true" converter="omnifaces.SelectItemsConverter"
+													 filterMatchMode="startsWith"
+													 disabled="#{formulario110Controller.formulario.estadoFormularioId == 'ACP' or formulario110Controller.formulario.estadoFormularioId == 'DEC'}">
+										>
+										<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+													  noSelectionOption="true" />
+										<f:selectItems
+												value="#{formulario110Controller.listaSucursales}"
+												var="sucursal" itemLabel="#{sucursal.numeroSucursal} - #{sucursal.direccion}"
+												itemValue="#{sucursal}" />
+										<p:clientValidator event="change" />
+									</p:selectOneMenu>
+									<p:ajax event="save"
+											listener="#{formulario110Controller.cambiarDireccionSucursal()}"
+											update="formPrincipal " />
+								</p:inplace>
+								<p:message for="direcEmpleador" />
+							</p:row>
+						</p:panelGrid>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel header="Detalle Facturas" toggleable="true"
+					styleClass="ui-fluid">
+
+					<p:panelGrid id="pnlgDesAsociarTodas" columns="3"
+						rendered="#{formulario110Controller.formulario.estadoFormularioId =='REG' or formulario110Controller.formulario.estadoFormularioId =='RECH'}"
+						columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:spacer />
+						<p:commandButton id="btnAsociarFacturas" process="@this"
+							update="formPrincipal formPrincipalAsc "
+							title="Asociar compras a formulario" style="float:center;"
+							ajax="true" value="Selección Compras"
+							styleClass="btn-sm btn-primary"
+							oncomplete="PF('dlgAscCompras').show();" icon="fa fa-check"
+							actionListener="#{formulario110Controller.filtrarComprasPosibles()}">
+						</p:commandButton>
+						<p:commandButton id="btnDesasociarFacturastodas"
+							value="Desmarcar Todas"
+							actionListener="#{formulario110Controller.desmarcarTodasLasCompras()}"
+							process="@this" update="formPrincipal"
+							title="Desmarcar Todas las Facturas" style="float:center;"
+							ajax="true" styleClass="btn-sm btn-warning" icon="fa fa-undo">
+							<p:confirm header="Confirmar"
+								message="¿Está seguro que desea desmarcar todas las facturas contenidas en el presente formulario?"
+								icon="ui-icon-alert" />
+						</p:commandButton>
+
+					</p:panelGrid>
+					<p:spacer></p:spacer>
+					<p:dataTable var="factura"
+						value="#{formulario110Controller.vListaAsociadas}"
+						id="tblFacturas"
+						emptyMessage="No se encontraron facturas para el formulario seleccionado"
+						styleClass="table table-striped table-bordered table-hover table-sm"
+						widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="10"
+						paginator="true" sortMode="multiple" paginatorPosition="bottom"
+						rowsPerPageTemplate="5,10,20" paginatorAlwaysVisible="false"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="{totalRecords} registros"
+						toggleable="true" editable="false">
+						<p:column headerText="N°" styleClass="ui-icon-table">
+							<p:outputLabel value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column headerText="NIT Proveedor" style="text-align:center"
+							sortBy="#{factura.nitProveedor}">
+							<h:outputText value="#{factura.nitProveedor}" style="float:right" />
+						</p:column>
+						<p:column headerText="Razón Social" style="text-align:center">
+							<h:outputText value="#{factura.razonSocialProveedor}" style="float:left"/>
+						</p:column>
+						<p:column headerText="N° Factura" style="text-align:center">
+							<h:outputText value="#{factura.numeroFactura}"
+								style="float:right" />
+						</p:column>
+						<p:column headerText="N° Autorización/CUF"
+							style="text-align:center">
+							<h:outputText value="#{factura.codigoAutorizacion}"
+								style="float:right" />
+						</p:column>
+						<p:column sortBy="#{factura.fechaFactura}"
+							headerText="Fecha Emisión" style="text-align:center">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{factura.fechaFactura}">
+										<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+									<p:inputMask id="txtFechaEmision" required="true"
+										value="#{factura.fechaFactura}" mask="99/99/9999"
+										requiredMessage="Fecha emision dato requerido"
+										styleClass="ui-fluid" converterMessage="Formato incorrecto">
+										<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+										<p:message id="mfecha" for="txtFechaEmision"></p:message>
+									</p:inputMask>
+									<p:watermark value="dd/MM/yyyy" for="txtFechaEmision" />
+
+								</f:facet>
+							</p:cellEditor>
+
+						</p:column>
+						<p:column headerText="Importe Total"
+							sortBy="#{factura.importeTotalCompra}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText style="float:right"
+										value="#{factura.marcaEspecialId=='7RG'?factura.importeTotalCompra: factura.importeBaseCf}">
+										<f:convertNumber locale="en-US" pattern="#,##0.00" />
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+
+									<p:inputNumber id="txtMontoTotal" maxValue="999999999999999.99"
+										decimalPlaces="2" thousandSeparator="," decimalSeparator="."
+										minValue="0.00" value="#{factura.importeTotalCompra}">
+										<p:message id="mImporteTotal" for="txtMontoTotal">
+										</p:message>
+
+									</p:inputNumber>
+									<p:keyFilter for="txtMontoTotal" regEx="/[\d]/" />
+
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Cod. Control">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{factura.codigoControl}">
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+									<p:inputMask id="txtCodControl"
+										value="#{factura.codigoControl}" mask="**-**-**-**?-**"
+										readonly="#{factura.modalidadId=='MAN' or 
+									factura.modalidadId=='FCL' or factura.modalidadId=='FPW' or factura.modalidadId=='FEL' 
+									or factura.modalidadId=='FEL' or factura.modalidadId=='PRE'}">
+									</p:inputMask>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Tipo Factura" style="text-align:center"
+							sortBy="#{factura.marcaEspecialId}">
+							<h:outputText
+								value="#{factura.modalidadId=='FEL' or factura.modalidadId=='FPW' 
+							or factura.modalidadId=='FCL'?'LIN ':''}" />
+							<h:outputText
+								value="#{factura.modalidadId=='ELE' or factura.modalidadId=='CIC'?'E ':''}" />
+							<h:outputText
+								value="#{factura.marcaEspecialId=='IPN' ?'PROD-NAL ':''}" />
+							<h:outputText
+								value="#{factura.marcaEspecialId=='7RG' ?'7RG ':''}" />
+						</p:column>
+						<p:column headerText="Desmarcar" style="text-align: center"
+							rendered="#{formulario110Controller.formulario.estadoFormularioId !='DEC' and formulario110Controller.formulario.estadoFormularioId !='ACP'}">
+							<p:commandLink
+								action="#{formulario110Controller.desmarcarCompra(factura)}"
+								process="@this" update="formPrincipal">
+								<span class="fa fa-undo" title="Desmarcar Factura"></span>
+							</p:commandLink>
+							<p:confirmDialog global="true" showEffect="fade"
+								responsive="true" position="center center">
+								<p:commandButton value="Si"
+									styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+									icon="fa fa-check" />
+								<p:commandButton value="No"
+									styleClass="ui-confirmdialog-no btn-warning btn-sm"
+									icon="fa fa-close" />
+							</p:confirmDialog>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+
+				<p:panel id="pnDetTotales" header="Detalles de Totales"
+					styleClass="ui-fluid">
+					<p:panelGrid columns="3"
+						columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:row style="text-align:center">
+							<p:outputLabel value="CANTIDAD FACTURAS" style="float:center" />
+						</p:row>
+
+						<p:outputLabel value="TOTAL IMPORTE" style="text-align:center" />
+						<p:outputLabel value="DET. PAGO A CUENTA"
+							style="text-align:center" />
+					</p:panelGrid>
+
+					<p:panelGrid columns="6" colSpan="2"
+						columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2, ui-grid-col-2,ui-grid-col-2, ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:outputLabel value="Facturas Prod. Nal.:" />
+						<p:inputText id="CantidadIPN"
+							value="#{formulario110Controller.cantidadComprasIpn}"
+							readonly="true" style="text-align: right" />
+						<p:outputLabel value="Importe Prod. Nal. :" />
+						<p:inputText id="SumaTotalIpn"
+							value="#{formulario110Controller.vSumaTotalMontosIpn}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+						<p:outputLabel value="Det. Prod. Nal.:" />
+						<p:inputText value="#{formulario110Controller.vPagoaCuentaIpn}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+
+						<p:outputLabel value="Otras Facturas:" />
+						<p:inputText id="CantidadOtras"
+							value="#{formulario110Controller.cantidadComprasOtras}"
+							readonly="true" style="text-align: right" />
+						<p:outputLabel value="Importe Otras Facturas:" />
+						<p:inputText id="SumaTotalOtras"
+							value="#{formulario110Controller.vSumaTotalMontosOtras}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+
+						<p:outputLabel value="Det. Otras Facturas:" />
+						<p:inputText value="#{formulario110Controller.vPagoaCuentaOtras}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+
+					</p:panelGrid>
+					<p:spacer />
+
+					<p:panelGrid columns="6"
+						columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2, ui-grid-col-2,ui-grid-col-2, ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:spacer />
+						<p:spacer />
+						<p:spacer />
+						<p:spacer />
+						<p:outputLabel value="Total Determinación del pago a Cuenta" />
+						<p:inputText value="#{formulario110Controller.vPagoaCuentaCf}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+					</p:panelGrid>
+					<p:separator />
+					<p:panelGrid columns="6"
+						columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2, ui-grid-col-2,ui-grid-col-2, ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+
+						<p:outputLabel value="Facturas SIETE-RG:" />
+						<p:inputText id="cantidads"
+							value="#{formulario110Controller.cantidadComprasSieteRg}"
+							readonly="true" style="text-align: right" />
+						<p:outputLabel value="Importe SIETE-RG:" />
+						<p:inputText id="SumaTotal3"
+							value="#{formulario110Controller.vSumaTotalMontosSieteRg}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+						<p:outputLabel value="Pago a Cuenta por Facturas SIETE-RG:" />
+						<p:inputText
+							value="#{formulario110Controller.vPagoaCuentaSieteRg}"
+							readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+
+					</p:panelGrid>
+					<p:spacer></p:spacer>
+					<p:panelGrid columns="3"
+						columnClasses="ui-grid-col-8,ui-grid-col-2, ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank box-primary">
+						<p:spacer />
+						<p:spacer
+							rendered="#{formulario110Controller.formulario.estadoFormularioId=='ACP'}" />
+<!--						<p:spacer-->
+<!--							rendered="#{formulario110Controller.formulario.estadoFormularioId=='DEC' and -->
+<!--							formulario110Controller.formulario.datosEspecificos.montoOtrosFormRech!=null and-->
+<!--							formulario110Controller.formulario.datosEspecificos.montoIpnFormRech!=null and -->
+<!--							formulario110Controller.formulario.datosEspecificos.montoSieteRgFormRech!=null}" />-->
+							<p:spacer rendered="#{formulario110Controller.vListaDesseleccionadosSinGuardar.size()==0 and
+						formulario110Controller.vListaSeleccioandosSinGuardar.size()==0 and 
+						formulario110Controller.formulario.estadoFormularioId=='REG'}"></p:spacer>
+						<p:commandButton id="btnGuardar" value="Guardar Cambios"
+							styleClass="btn btn-sm btn-primary" update="formPrincipal"
+							rendered="#{formulario110Controller.vListaDesseleccionadosSinGuardar.size()!=0 or
+						formulario110Controller.vListaSeleccioandosSinGuardar.size()!=0}"
+							action="#{formulario110Controller.persistirCambios()}">
+						</p:commandButton>
+						<p:commandButton value="Realizar Declaración"
+							rendered="#{formulario110Controller.formulario.estadoFormularioId=='REG'}"
+							disabled="#{(formulario110Controller.cantidadComprasOtras==0 and
+							formulario110Controller.cantidadComprasIpn==0 and formulario110Controller.cantidadComprasSieteRg==0) or
+							(formulario110Controller.vListaDesseleccionadosSinGuardar.size()!=0 or
+							formulario110Controller.vListaSeleccioandosSinGuardar.size()!=0)}"
+							style="float:right" update="formPrincipal"
+							styleClass="btn btn-success btn-sm"
+							action="#{formulario110Controller.declarar()}">
+							<p:confirm header="Confirmar"
+								message="¿Está seguro de realizar su declaración? Si continua, sólo podrá cambiar su selección de 
+								facturas mientras su agente de retención no confirme o rechace su F-110."
+								icon="ui-icon-alert" />
+						</p:commandButton>
+						<visor:visorPdf esVisibleBoton="#{!(formulario110Controller.cantidadComprasOtras==0 and
+							formulario110Controller.cantidadComprasIpn==0 and formulario110Controller.cantidadComprasSieteRg==0)}"
+							nombreWidgetVar="idFormularioInscripcionDlg"
+							txtButtonAccion="Imprimir" icon="fa  fa-print"
+							styleClass="btn btn-danger btn-sm"
+							archivoB64="#{formulario110Controller.reportesController.respuestaBase64}"
+							txtTitulo="Formulario 110" id="btnVisorPdf"
+							rendered="#{formulario110Controller.formulario.estadoFormularioId!='REG' and
+							(formulario110Controller.vListaDesseleccionadosSinGuardar.size()==0 and
+							formulario110Controller.vListaSeleccioandosSinGuardar.size()==0)}">
+						</visor:visorPdf>
+
+						<p:commandButton value="Realizar Declaración"
+							disabled="#{(formulario110Controller.cantidadComprasOtras==0 and
+							formulario110Controller.cantidadComprasIpn==0 and formulario110Controller.cantidadComprasSieteRg==0) or
+							(formulario110Controller.vListaDesseleccionadosSinGuardar.size()!=0 or
+							formulario110Controller.vListaSeleccioandosSinGuardar.size()!=0)}"
+							rendered="#{formulario110Controller.formulario.estadoFormularioId=='RECH'}"
+							style="float:right" styleClass="btn btn-warning btn-sm"
+							update="formPrincipal"
+							action="#{formulario110Controller.rectificar()}">
+							<p:confirm header="Confirmar"
+								message="¿Está seguro de rectificar su declaración? Si continua, sólo podrá cambiar su selección de 
+								facturas cuando su agente de retención rechace su F-110."
+								icon="ui-icon-alert" />
+							</p:commandButton>
+						<p:commandButton value="Cancelar Declaración"
+							rendered="#{formulario110Controller.formulario.estadoFormularioId=='DEC'}"
+							style="float:right" styleClass="btn btn-warning btn-sm"
+							update="formPrincipal"
+							action="#{formulario110Controller.cancelarDeclaracion()}" />
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+							responsive="true" position="center center" appendTo="@(body)">
+
+							<p:commandButton value="Si"
+								styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+								icon="fa fa-check" />
+							<p:commandButton value="No"
+								styleClass="ui-confirmdialog-no btn-warning btn-sm"
+								icon="fa fa-close" />
+						</p:confirmDialog>
+					</p:panelGrid>
+				</p:panel>
+
+
+			</p:panel>
+			<p:panel visible="false">
+				<visor:visorPdf esVisibleBoton="true"
+					nombreWidgetVar="idFormularioInscripcionDlg"
+					txtButtonAccion="Imprimir" icon="fa  fa-print"
+					styleClass="btn btn-danger pull-right"
+					archivoB64="#{formulario110Controller.reportesController.respuestaBase64}"
+					txtTitulo="Formulario 110" id="reportePdf">
+				</visor:visorPdf>
+			</p:panel>
+		</h:form>
+<p:dialog id="dlgAgregaFormulario"
+			header="Registro Nuevo Formulario 110" appendToBody="true"
+			height="70%" width="95%" widgetVar="dlgAgregaFormulario" modal="true"
+			scroll="true" showEffect="size" hideEffect="fade" resizable="false"
+			dynamic="true">
+			<h:form id="cformularioNuevo">
+				<p:panel id="pnlTipoUso" styleClass="box-primary ui-fluid"
+						 toggleable="true">
+					<p:panelGrid  columns="2" columnClasses="ui-grid-col-2,ui-grid-col-10"
+								  layout="grid" styleClass="ui-panelgrid-blank">
+						<p:row>
+							<p:outputLabel class="control-label"
+										   value="Tipo Formulario:"/>
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+						<p:row>
+							<p:selectOneMenu id="radTipoUso" style="width:100%"
+											 value="#{formulario110Controller.formularioNuevo.tipoUsoId}"
+											 required="true" requiredMessage="Dato Requerido">
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+											  noSelectionOption="true" />
+								<f:selectItems
+										value="#{formulario110Controller.listaTipoUso}" var="c"
+										itemLabel="#{c.descripcion}"
+										itemValue="#{c.codigoClasificador}" />
+								<p:clientValidator event="change" />
+							</p:selectOneMenu>
+							<p:message for="radTipoUso"></p:message>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:panel id="pnlNuevForm" styleClass="box-primary ui-fluid"
+					toggleable="true">
+					<p:panelGrid  columns="2" columnClasses="ui-grid-col-6,ui-grid-col-6"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						
+						<p:panelGrid id="pnGDatosDependiente" columns="2"
+						columnClasses="ui-grid-col-4,ui-grid-col-8"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<f:facet name="header">
+       							<p:row> <p:outputLabel class="control-label" value="DATOS DEPENDIENTE:" /> </p:row>
+       					</f:facet>
+							<p:row>
+								<p:outputLabel >Tipo Documento Identidad: </p:outputLabel>
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+							</p:row>
+
+						<p:row>
+							<p:selectOneMenu id="tipoDoc"
+								value="#{formulario110Controller.formularioNuevo.datosEspecificos.tipoDocumento}"
+								required="true" requiredMessage="Dato Requerido">
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									noSelectionOption="true" />
+								<f:selectItems
+									value="#{formulario110Controller.listaTipoDocumento}" var="doc"
+									itemLabel="#{doc.descripcion}"
+									itemValue="#{doc.codigoClasificador}" />
+								<p:clientValidator event="change" />
+								<p:ajax event="change" process="tipoDoc"
+									update="pnGDatosDependiente" />
+							</p:selectOneMenu>
+							<p:message for="tipoDoc" />
+						</p:row>
+						<p:row>
+							<p:outputLabel class="control-label"
+										   value="Número Documento Identidad: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:inputText id="nroDocumento"
+								value="#{formulario110Controller.formularioNuevo.datosEspecificos.numeroDocumento}"
+								required="true" requiredMessage="Dato Requerido"
+								readonly="#{formulario110Controller.formularioNuevo.datosEspecificos.numeroDocumento != null and 
+									formulario110Controller.formularioNuevo.datosEspecificos.numeroDocumento !='' }">
+								<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+								<p:clientValidator event="blur" />
+								<p:clientValidator event="keyup" />
+							</p:inputText>
+							<p:message for="nroDocumento" />
+						</p:row>
+						<p:row rendered="#{formulario110Controller.formularioNuevo.datosEspecificos.tipoDocumento=='CI'}">
+							<p:outputLabel id="lblComple" class="control-label"
+										   value="Complemento Documento:"
+										    />
+						</p:row>
+
+						<p:row>
+							<p:inputText id="complementoDoc"
+								rendered="#{formulario110Controller.formularioNuevo.datosEspecificos.tipoDocumento=='CI'}"
+								value="#{formulario110Controller.formularioNuevo.datosEspecificos.complementoDocumento}"
+								required="false" requiredMessage="Dato Requerido"
+							maxlength="2">
+								<p:keyFilter regEx="/[A-Z0-9]/i" preventPaste="false" />
+								<p:clientValidator event="blur" />
+								<p:clientValidator event="keyup" />
+							</p:inputText>
+							<p:message for="complementoDoc" />
+						</p:row>
+							<p:row rendered="#{formulario110Controller.formularioNuevo.datosEspecificos.tipoDocumento=='CI'}">
+								<p:outputLabel id="lugarExpLabel" class="control-label"
+											   value="Lugar de Expedición:"
+											    />
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+							</p:row>
+
+						<p:row>
+							<p:selectOneMenu id="idLugarExp"
+								rendered="#{formulario110Controller.formularioNuevo.datosEspecificos.tipoDocumento=='CI'}"
+								value="#{formulario110Controller.formularioNuevo.datosEspecificos.lugarExpedicion}"
+								required="#{formulario110Controller.formularioNuevo.datosEspecificos.tipoDocumento=='CI'}"
+								requiredMessage="Dato Requerido">
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									noSelectionOption="true" />
+								<f:selectItems
+									value="#{formulario110Controller.listaDepartamentos}"
+									var="depto" itemLabel="#{depto.nombre}"
+									itemValue="#{depto.departamentoId}" />
+								<p:clientValidator event="change" />
+							</p:selectOneMenu>
+							<p:message for="idLugarExp" />
+						</p:row>
+							<p:row>
+								<p:outputLabel class="control-label"
+											   value="Dirección Dependiente: " />
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+							</p:row>
+
+						<p:row>
+							<p:inputText id="direccion"
+								value="#{formulario110Controller.formularioNuevo.direccion}"
+								required="true" requiredMessage="Dato Requerido"
+								style="text-transform:uppercase;">
+								<p:keyFilter regEx="/[A-Za-z ÑñáéíóúÁÉÍÓÚ.,-:0-9]/i"
+									preventPaste="false" />
+								<p:clientValidator event="blur" />
+								<p:clientValidator event="keyup" />
+							</p:inputText>
+							<p:message for="direccion" />
+						</p:row>
+					</p:panelGrid>
+					<p:panelGrid id="pnGAgente" columns="2"
+						columnClasses="ui-grid-col-4,ui-grid-col-8"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<f:facet name="header">
+       							<p:row> <p:outputLabel class="control-label" value="DATOS F110:" /> </p:row>
+       						</f:facet>
+						<p:row>
+							<p:outputLabel class="control-label" value="Gestión: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:selectOneMenu id="gestion"
+								value="#{formulario110Controller.formularioNuevo.anioPeriodo}"
+								required="true" requiredMessage="Dato Requerido">
+
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									noSelectionOption="true" />
+								<f:selectItems
+									value="#{of:createIntegerArray(of:formatDate(now,'yyyy')+1,of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+								<p:clientValidator event="change" />
+							</p:selectOneMenu>
+							<p:message for="gestion" />
+						</p:row>
+						<p:row>
+							<p:outputLabel class="control-label" value="Periodo: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:selectOneMenu id="mes"
+								value="#{formulario110Controller.formularioNuevo.mesPeriodo}"
+								required="true" requiredMessage="Dato Requerido">
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									noSelectionOption="true" />
+								<f:selectItem itemValue="1" itemLabel="ENERO" />
+								<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+								<f:selectItem itemValue="3" itemLabel="MARZO" />
+								<f:selectItem itemValue="4" itemLabel="ABRIL" />
+								<f:selectItem itemValue="5" itemLabel="MAYO" />
+								<f:selectItem itemValue="6" itemLabel="JUNIO" />
+								<f:selectItem itemValue="7" itemLabel="JULIO" />
+								<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+								<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+								<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+								<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+								<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+								<p:clientValidator event="change" />
+							</p:selectOneMenu>
+							<p:message for="mes" />
+						</p:row>
+						<p:row>
+							<p:outputLabel class="control-label" value="Lugar de Presentación: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:selectOneMenu id="lugarPresentacion"
+								value="#{formulario110Controller.formularioNuevo.lugarDepartamento}"
+								required="true" requiredMessage="Dato Requerido">
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									noSelectionOption="true" />
+								<f:selectItems
+									value="#{formulario110Controller.listaDepartamentos}"
+									var="depto" itemLabel="#{depto.nombre}"
+									itemValue="#{depto.departamentoId}" />
+								<p:ajax event="change" process="@this"
+										update="btnAdicionarFormulario razonSocialEmpleador dirEmpleador"
+										listener="#{formulario110Controller.verificaNit}" />
+							</p:selectOneMenu>
+							<p:message for="lugarPresentacion" />
+						</p:row>
+						<p:row>
+							<p:outputLabel value="Fecha de Presentación: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:inputMask id="txtFechaPresentacion" required="true"
+								requiredMessage="Dato Requerido"
+								value="#{formulario110Controller.formularioNuevo.fechaPresentacion}"
+								mask="99/99/9999" converterMessage="Formato incorrecto">
+								<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+								<p:clientValidator event="change" />
+								<p:clientValidator event="blur" />
+							</p:inputMask>
+							<p:message for="txtFechaPresentacion" />
+						</p:row>
+						<p:outputLabel class="control-label" value="DATOS AGENTE DE RETENCIÓN:" />
+						<p:spacer/>
+						<p:row>
+							<p:outputLabel class="control-label" value="NIT Agente de Retención: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:inputText id="nitEmpleador"
+								value="#{formulario110Controller.formularioNuevo.nitEmpleador}"
+								required="true" requiredMessage="Dato Requerido">
+								<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+								<p:clientValidator event="blur" />
+								<p:clientValidator event="keyup" />
+								<p:ajax event="change" process="@this"
+									update="btnAdicionarFormulario razonSocialEmpleador dirEmpleador"
+									listener="#{formulario110Controller.verificaNit()}" />
+							</p:inputText>
+							<p:message for="nitEmpleador" />
+						</p:row>
+						<p:row>
+							<p:outputLabel class="control-label"  value="Nombre o Razón Social:" />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:outputLabel id="razonSocialEmpleador"
+								value="#{formulario110Controller.formularioNuevo.nombreEmpleador}"
+								readonly="true">
+							</p:outputLabel>
+						</p:row>
+						<p:row>
+							<p:outputLabel for="dirEmpleador" class="control-label"
+										   value="Dirección Empleador: " />
+							<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+						</p:row>
+
+						<p:row>
+							<p:selectOneMenu id="dirEmpleador" style="width:100%"
+											 value="#{formulario110Controller.sucursalSeleccinado}"
+											 required="true"
+											 requiredMessage="Dato Requerido"
+											 filter="true" converter="omnifaces.SelectItemsConverter"
+											 filterMatchMode="startsWith">
+								<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+											  noSelectionOption="true" />
+								<f:selectItems
+										value="#{formulario110Controller.listaSucursales}"
+										var="sucursal" itemLabel="#{sucursal.numeroSucursal} - #{sucursal.direccion}"
+										itemValue="#{sucursal}" />
+								<p:clientValidator event="change" />
+							</p:selectOneMenu>
+							<p:message for="dirEmpleador" />
+						</p:row>
+
+					</p:panelGrid>
+					
+				</p:panelGrid>
+				<p:spacer/>
+
+					<p:panelGrid id="panelBotonesForm" columns="3"
+						columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:row>
+						<p:outputLabel style="color:dodgerblue;">Los campos marcados con (*) son obligatorios</p:outputLabel>
+						</p:row>
+						<p:commandButton id="btnAdicionarFormulario"
+							value="Agregar Formulario" style="float:right"
+							styleClass="btn btn-primary btn-sm" validateClient="true"
+							process="@form @this" icon="fa fa-check"
+							disabled="#{!formulario110Controller.nitEmpleadorValido}"
+							update="@([id$=pnlDetalleFormulario]) cformularioNuevo @([id$=formPrincipal])"
+							actionListener="#{formulario110Controller.adicionarFormulario()}">
+						</p:commandButton>
+						<p:commandButton id="cerrar2" value="Cerrar" immediate="true"
+							icon="fa fa-close" validateClient="false"
+							styleClass="ui-confirmdialog-yes btn btn-warning btn-sm"
+							actionListener="#{formulario110Controller.nuevoFormulario()}"
+							onclick="PF('dlgAgregaFormulario').hide();"
+							update="dlgAgregaFormulario">
+						</p:commandButton>
+					</p:panelGrid>
+
+				</p:panel>
+
+			</h:form>
+
+		</p:dialog>
+
+		<p:dialog id="dlgAscCompras" header="Selección de Compras"
+			widgetVar="dlgAscCompras" modal="true" scroll="true"
+			position="center center" showEffect="fade" hideEffect="fade"
+			resizable="false" dynamic="true" height="50%" width="90%">
+			<h:form id="formPrincipalAsc">
+				<sre:ComponenteAsociacionCompras id="asocCompras"
+					facturaAscSelect="#{formulario110Controller.facturasAscSelect}"
+					listaComprasLazy="#{formulario110Controller.vListaSeleccionables}"
+					asociarAction="#{formulario110Controller.adicionarSeleccionados()}"></sre:ComponenteAsociacionCompras>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgConfirmFecha" header="Confirmarción"
+			appendToBody="true" height="30%" width="50%"
+			widgetVar="dlgConfirmFecha" modal="true" scroll="true"
+			showEffect="size" hideEffect="fade" resizable="false" dynamic="true">
+			<h:form id="formConfirmacion">
+				<p:outputLabel>¿Está seguro de cambiar la fecha de presentación?. Las facturas que queden fuera del rango admitido serán desmarcadas. </p:outputLabel>
+				<!-- 				 ="#{formulario110Controller.cambiarFechaPresentacionFormulario()}" update="formPrincipal"-->
+				<p:panelGrid id="panelBotones" columns="4"
+					columnClasses="ui-grid-col-8,ui-grid-col-1,ui-grid-col-1,ui-grid-col-1"
+					layout="grid" styleClass="ui-panelgrid-blank">
+					<p:spacer />
+
+					<p:commandButton value="Si" icon="fa fa-check"
+						styleClass="btn btn-primary btn-sm" process="@this"
+						actionListener="#{formulario110Controller.cambiarFechaPresentacionFormulario()}"
+						oncomplete="PF('dlgConfirmFecha').hide();" update="formPrincipal" />
+					<p:spacer />
+					<p:commandButton value="No" icon="fa fa-close"
+						actionListener="#{formulario110Controller.retornaValores()}"
+						styleClass="btn btn-warning btn-sm"
+						oncomplete="PF('dlgConfirmFecha').hide();" update="formPrincipal" />
+				</p:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+
+	</ui:define>
+</ui:composition>

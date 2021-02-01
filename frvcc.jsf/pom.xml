@@ -1,0 +1,287 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>bo.gob.sin.sre.fac.frvcc</groupId>
+	<artifactId>frvcc.jsf</artifactId>
+	<version>0.8.0.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>sre.fac.frvcc.jsf</name>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+	</properties>
+
+	<build>
+		<finalName>frvcc</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-web-api</artifactId>
+			<version>8.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.faces</groupId>
+			<artifactId>javax.faces-api</artifactId>
+			<version>2.3</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+			<version>4.0.1</version>
+		</dependency>
+
+		<!-- Entorno -->
+		<dependency>
+			<groupId>bo.gob.sin.sen.enmo</groupId>
+			<artifactId>enmo.jsf</artifactId>
+			<version>1.2.0.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>bo.gob.sin.str.caut</groupId>
+					<artifactId>caut.security</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+        <dependency>
+            <groupId>bo.gob.sin.str.caut</groupId>
+            <artifactId>caut.security</artifactId>
+			<version>0.1.0.0</version>
+        </dependency>
+		<dependency>
+			<groupId>bo.gob.sin.sen.enco</groupId>
+			<artifactId>enco.comun</artifactId>
+			<version>1.2.0.1</version>
+			<exclusions>
+			<exclusion>
+				<groupId>bo.gob.sin.str.caut</groupId>
+				<artifactId>caut.security</artifactId>
+			</exclusion>
+		</exclusions>
+		</dependency>
+
+		<!-- Usuario -->
+		<dependency>
+			<groupId>bo.gob.sin.sau.ausu</groupId>
+			<artifactId>ausu.dto</artifactId>
+			<version>1.3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.sau.ausu</groupId>
+			<artifactId>ausu.dto</artifactId>
+			<version>0.3.0.0</version>
+		</dependency>
+
+		<!--<dependency>
+			<groupId>bo.gob.sin.sau.arol</groupId>
+			<artifactId>arol.dto</artifactId>
+			<version>1.3.0.0</version>
+		</dependency>-->
+		<!--<dependency>
+			<groupId>bo.gob.sin.sau.arol</groupId>
+			<artifactId>arol.dto</artifactId>
+			<version>0.3.0.0</version>
+		</dependency>-->
+
+		<!-- Seguridad -->
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.8.1</version>
+		</dependency>
+
+		<!-- Transversales -->
+		<dependency>
+			<groupId>bo.gob.sin.str.util</groupId>
+			<artifactId>util.nit</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.str.ccs.dpto</groupId>
+			<artifactId>dpto.dto</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>bo.gob.sin.str.util</groupId> -->
+<!-- 			<artifactId>util.compresion</artifactId> -->
+<!-- 			<version>RELEASE</version> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>bo.gob.sin.str</groupId>
+			<artifactId>jsfc</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.str.cmsj.mapl</groupId>
+			<artifactId>mapl.dto</artifactId>
+			<version>1.1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.str.cmsj</groupId>
+			<artifactId>cmsj.mail</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>bo.gob.sin.str.cses</groupId>
+			<artifactId>cses.redis</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+    		<groupId>bo.gob.sin.str</groupId>
+    		<artifactId>cexc</artifactId>
+    		<version>1.1.0.0</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>bo.gob.sin.str.cmsj.mapl</groupId>
+    		<artifactId>mapl.dto</artifactId>
+    		<version>0.1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.str</groupId>
+			<artifactId>cpdf.jsf</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>bo.gob.sin.str.cps.clas</groupId>
+    		<artifactId>clas.dto</artifactId>
+    		<version>1.1.0.1</version>
+		</dependency>
+		
+		<dependency>
+   	 		<groupId>bo.gob.sin.str.util</groupId>
+    		<artifactId>util.nit</artifactId>
+    		<version>0.1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.scn.empa.caco</groupId>
+			<artifactId>caco.dto</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.scn.empa.caec</groupId>
+			<artifactId>caec.dto</artifactId>
+			<version>0.16.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.scn.empa.casu</groupId>
+			<artifactId>casu.dto</artifactId>
+			<version>0.16.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.scn.empa.capd.apnd</groupId>
+			<artifactId>apnd.dto</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.scn.empa.capd.apjd</groupId>
+			<artifactId>apjd.dto</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>bo.gob.sin.scn.empa.capd.aper</groupId>
+			<artifactId>aper.dto</artifactId>
+			<version>0.16.0.0</version>
+		</dependency>
+		
+		<!-- Apache binary Base64 -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+
+		<!-- Jasper Report -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.4.3</version>
+		</dependency>
+		<dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+        
+        <dependency>
+    		<groupId>bo.gob.sin.str.ccs</groupId>
+    		<artifactId>ccs.repo</artifactId>
+   			<version>RELEASE</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+
+		<!-- Dependencias para consumo del servicio -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20170516</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.9.7</version>
+		</dependency>
+		<!-- generacion de excel -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>javacsv</groupId>
+			<artifactId>javacsv</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.2</version>
+		</dependency>
+	</dependencies>
+	
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://siatrepositorio.impuestos.gob.bo:8081/artifactory/SIAT-Snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateNoAuth.xhtml"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor">
+
+	<f:metadata>
+		<f:viewAction action="#{logedBean.check}" />
+	</f:metadata>
+
+	<ui:define name="title">MIS NOTAS</ui:define>
+	<ui:define name="body">
+	
+		<f:event type="preRenderView"
+			listener="#{menuLateralBean.actualizaMenuLateral()}" />
+
+		<h:form id="frmBusqueda">
+
+			<p:panel header="Búsqueda Notas Debito Credito" toggleable="true" id="idBusqueda"
+				styleClass="card box-primary ui-fluid">
+				<p:panelGrid id="pnlCriterios" columns="6"
+					columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2"
+					layout="grid" styleClass="ui-flui">
+					<p:outputLabel value="Gestión: " />
+					<p:selectOneMenu
+						value="#{busquedaNotasDebitoCreditoController.gestion}"
+						id="txtGestion">
+						<f:selectItems
+							value="#{of:createIntegerArray(of:formatDate(now,'yyyy'),of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2016))}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Periodo: " />
+					<p:selectOneMenu
+						value="#{busquedaNotasDebitoCreditoController.periodo}"
+						id="txtPeriodo">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+						<f:selectItem itemValue="1" itemLabel="ENERO" />
+						<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+						<f:selectItem itemValue="3" itemLabel="MARZO" />
+						<f:selectItem itemValue="4" itemLabel="ABRIL" />
+						<f:selectItem itemValue="5" itemLabel="MAYO" />
+						<f:selectItem itemValue="6" itemLabel="JUNIO" />
+						<f:selectItem itemValue="7" itemLabel="JULIO" />
+						<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+						<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+						<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+						<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+						<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Estado Uso" />
+					<p:row>
+						<p:selectOneMenu id="ddlEstadoUso"
+							value="#{busquedaNotasDebitoCreditoController.estadoUsoId}">
+							<f:selectItem itemLabel="Seleccionar" itemValue="" />
+							<f:selectItem itemLabel="REGISTRADO" itemValue="REG" />
+							<f:selectItem itemLabel="ASOCIADO" itemValue="ASC" />
+							<f:selectItem itemLabel="DECLARADO" itemValue="DEC" />
+							<f:selectItem itemLabel="CONSOLIDADO" itemValue="CON" />
+							<f:ajax event="change" process="@this" update="ddlEstadoUso">
+							</f:ajax>
+						</p:selectOneMenu>
+					</p:row>
+					<p:outputLabel value="Nit Proveedor" />
+					<p:row>
+						<p:inputText id="txtNitProveedor" placeholder="Nit Proveedor"
+							maxlength="13" readonly="false"
+							validatorMessage="Debe seleccionar un valor"
+							requiredMessage="Campo requerido"
+							value="#{busquedaNotasDebitoCreditoController.nitProveedor}"
+							converterMessage="Debe ser un número Válido">
+							<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+							<p:clientValidator event="blur" />
+							<p:clientValidator event="keyup" />
+						</p:inputText>
+						<p:message for="txtNitProveedor"></p:message>
+					</p:row>
+
+					<p:outputLabel value="Fecha emisión" />
+					<p:row>
+						<p:calendar
+							value="#{busquedaNotasDebitoCreditoController.fechaNota}"
+							id="txtFechaEmision" showOn="button" pattern="dd/MM/yyyy"
+							maxdate="to_day">
+							<!-- 					<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" /> -->
+							<f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+						</p:calendar>
+						<!-- 				<p:message for="txtFechaEmision"></p:message> -->
+					</p:row>
+				
+					<p:commandButton id="idBuscar" value="Buscar" icon="fa fa-search"
+						styleClass="btn btn-primary btn-sm"
+						actionListener="#{busquedaNotasDebitoCreditoController.onBuscar}"
+						update="@([id$=idBusqueda])"
+						process="@this txtGestion txtPeriodo ddlEstadoUso txtNitProveedor txtFechaEmision">
+					</p:commandButton>
+					<p:commandButton id="idLimpiar" value="Limpiar"
+						styleClass="btn btn-warning btn-sm" process="@this"
+						actionListener="#{busquedaNotasDebitoCreditoController.onLimpiar}"
+						update="pnlCriterios dtFacturas pnlBotones">
+					</p:commandButton>
+					
+				</p:panelGrid>
+
+				<p:dataTable id="dtFacturas" emptyMessage="Sin registros"
+					var="nota" paginator="true" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} facturas"
+					rowsPerPageTemplate="10,20,30" rowIndexVar="rowIndex" rows="10"
+					paginatorPosition="bottom" rowKey="#{factura.id}" sortMode="single"
+					value="#{busquedaNotasDebitoCreditoController.notasLazy}">
+
+					<p:ajax event="rowSelect" update="@([id$=pnlBotoneraCompras])"
+						process="@this" />
+					<p:ajax event="rowUnselect" update="@([id$=pnlBotoneraCompras])"
+						process="@this" />
+					<p:ajax event="toggleSelect" update="@([id$=pnlBotoneraCompras])"
+						process="@this" />
+					<p:ajax event="rowSelectCheckbox"
+						update="@([id$=pnlBotoneraCompras])" process="@this" />
+					<p:ajax event="rowUnselectCheckbox"
+						update="@([id$=pnlBotoneraCompras])" process="@this" />
+
+					<p:column style="width:2%;text-align: center">
+						<f:facet name="header">
+							<h:outputText value="N°"></h:outputText>
+						</f:facet>
+						<h:outputText value="#{rowIndex+1}"></h:outputText>
+					</p:column>
+					<p:column headerText="NIT Proveedor" style="width:10%">
+						<h:outputText value="#{nota.nitProveedor}" />
+					</p:column>
+					<p:column headerText="Razón Social Proveedor" style="width:30%">
+						<h:outputText value="#{nota.razonSocialProveedor}"
+							style="width:100%" />
+					</p:column>
+					<p:column headerText="N° Nota" style="width:10%">
+						<h:outputText value="#{nota.numeroNota}" />
+					</p:column>
+					<p:column headerText="Codigo Autorización" style="width:15%">
+						<h:outputText value="#{nota.codigoAutorizacion}" />
+					</p:column>
+					<p:column headerText="Código Control Nota" style="width:10%">
+						<h:outputText value="#{nota.codigoControlNota}" style="width:100%" />
+					</p:column>
+					<p:column headerText="Fecha Nota" style="width:10%">
+						<h:outputText value="#{nota.fechaNota}">
+							<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Importe Total Nota"
+						style="width:5%; text-align: center">
+						<h:outputText value="#{nota.importeTotalNota}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Credito Fiscal Nota"
+						style="width:5%; text-align: center">
+						<h:outputText value="#{nota.creditoFiscalNota}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="N° Factura Original"
+						style="width:5%; text-align: center">
+						<h:outputText value="#{nota.numeroFacturaOriginal}">
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Fecha Factura Original" style="width:10%">
+						<h:outputText value="#{nota.fechaFacturaOriginal}">
+							<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Importe Total Original"
+						style="width:5%; text-align: center">
+						<h:outputText value="#{nota.importeTotalOriginal}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					
+					<p:column headerText="Estado Nota"
+						style="width:5%; text-align: center">
+						<h:outputText id="estadoFac"
+							value="#{nota.estadoNotaId}" />
+						
+					</p:column>
+					<p:column headerText="Estado de Uso"
+						style="width:5%; text-align: center">
+						<h:outputText
+							value="#{clasificadorController.descripcionEstadoUsoCompraByCodigo(nota.estadoUsoId)}" />
+					</p:column>
+					<p:column headerText="Formulario"
+						style="width:10%; text-align: center">
+						<h:outputText value="#{factura.nombreFormularioUso}" />
+					</p:column>
+					<p:column headerText="Acciones"
+						style="width:5%; text-align: center">
+
+						<p:commandLink
+							actionListener="#{busquedaNotasDebitoCreditoController.eliminarCompra(nota)}"
+							process="@this"
+							rendered="#{nota.estadoUsoId == 'REG'}"
+							update="dtFacturas">
+							<span class="fa fa-trash" title="Eliminar"> </span>
+							<p:confirm header="Confirmar"
+								message="¿Está seguro que desea eliminar la nota seleccionada?"
+								icon="ui-icon-alert" />
+						</p:commandLink>
+						<p:confirmDialog global="true" showEffect="fade" responsive="true"
+							position="center center">
+							<p:commandButton value="Si"
+								styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+								icon="fa fa-check" />
+							<p:commandButton value="No"
+								styleClass="ui-confirmdialog-no btn-default btn-sm"
+								icon="fa fa-close" />
+						</p:confirmDialog>
+					</p:column>
+
+				</p:dataTable>
+				<p:panelGrid id="pnlBotones" columns="6"
+					columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2"
+					layout="grid" styleClass="ui-fluid">
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:commandButton ajax="false" title="Descargar"
+						value="Descargar Consulta Excel"
+						actionListener="#{busquedaNotasDebitoCreditoController.excelComprasNotasConsultadas()}"
+						icon="fa fa-fw fa-download" styleClass="btn btn-success"
+						id="btnDownloadExcel"
+						rendered="#{busquedaNotasDebitoCreditoController.consultaRealizada}">
+						<p:fileDownload
+							value="#{busquedaNotasDebitoCreditoController.download}" />
+					</p:commandButton>
+				</p:panelGrid>
+
+			</p:panel>
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

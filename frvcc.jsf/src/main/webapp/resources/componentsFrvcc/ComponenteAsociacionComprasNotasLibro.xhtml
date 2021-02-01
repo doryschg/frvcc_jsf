@@ -1,0 +1,126 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:w="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:ldc="http://example.com/LocalDateConverter">
+<!-- INTERFACE -->
+<composite:interface>
+	<composite:attribute name="listaComprasLazy" />
+	<composite:attribute name="ComponenteButtonLimpiar" required="false"
+		method-signature="void DefaultMetod()" />
+	<composite:attribute name="facturaAscSelect" />
+	<composite:attribute name="asociarAction"
+		method-signature="void Action()" />
+
+</composite:interface>
+
+<!-- IMPLEMENTATION -->
+<composite:implementation>
+
+
+	<p:panel id="facComprasNotasPanel" styleClass="card box-primary ui-fluid">
+		<H4>Seleccione las notas de crédito y debito que desea asociar</H4>
+		<p:dataTable var="factura" id="tblFacturas"
+			emptyMessage="No se encontraron compras para asociar" lazy="true" rowKey="#{factura.id}"
+			value="#{cc.attrs.listaComprasLazy}" editable="true" editMode="cell"
+			styleClass="table table-striped table-bordered table-hover table-sm"
+			widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="5"
+			paginator="true" paginatorPosition="bottom"
+			rowsPerPageTemplate="5,10,20" paginatorAlwaysVisible="false"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			currentPageReportTemplate="{totalRecords} registros"
+			selection="#{cc.attrs.facturaAscSelect}" toggleable="true">
+			<!-- 			<p:ajax event="rowSelect" update="tblFacturas"/> -->
+			<p:column headerText="N°" styleClass="ui-icon-table">
+				<p:outputLabel value="#{rowIndex+1}" />
+			</p:column>
+			<p:column headerText="Fecha Nota Credito - Debito"
+				style="text-align:center">
+				<h:outputText value="#{factura.fechaNota}">
+					<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="N° Nota Crédito - Debito"
+				style="text-align:center">
+				<h:outputText value="#{factura.numeroNota}" />
+			</p:column>
+			<p:column headerText="N° Autorizacion" style="text-align:center">
+				<h:outputText value="#{factura.codigoAutorizacion}" />
+			</p:column>
+
+			<p:column headerText="Estado" style="text-align:center">
+				<h:outputText value="#{factura.estadoNotaId}" />
+			</p:column>
+			<p:column headerText="NIT/CI Cliente" style="text-align:center">
+				<h:outputText value="#{factura.numeroDocumentoCliente}" />
+			</p:column>
+			<p:column headerText="Nombre/Razón Social Cliente"
+				style="text-align:center">
+				<h:outputText value="#{factura.nombreCliente}" />
+			</p:column>
+
+			<p:column
+				headerText="Importe Total de la Devolucion o Recision Recibida">
+				<h:outputText style="float:right"
+					value="#{factura.importeTotalNota}">
+					<f:convertNumber pattern="#0.00" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Crédito fiscal">
+				<h:outputText style="float:right"
+					value="#{factura.creditoFiscalNota}">
+					<f:convertNumber pattern="#0.00" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Cod. Control de la Nota de Credito - Debito"
+				style="text-align:center">
+				<h:outputText value="#{factura.codigoControlNota}">
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Fecha Factura Original"
+				style="text-align:center">
+				<h:outputText value="#{factura.fechaFacturaOriginal}">
+					<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="N° Factura Original"
+				style="text-align:center">
+				<h:outputText value="#{factura.numeroFacturaOriginal}" />
+			</p:column>
+			<p:column headerText="N° Autorizacion Factura Original"
+				style="text-align:center">
+				<h:outputText value="#{factura.codigoAutorizacionOriginal}" />
+			</p:column>
+			<p:column headerText="Importe Total Factura Original"
+				style="text-align:center">
+				<h:outputText value="#{factura.importeTotalOriginal}" />
+			</p:column>
+
+			<p:column selectionMode="multiple" style="text-align:center"
+				headerText="Seleccionar">
+				<!-- 				<p:clientValidator event="click" /> -->
+			</p:column>
+		</p:dataTable>
+		<p:panelGrid id="pnlgAsocNotas" columns="3"
+										columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+										layout="grid" styleClass="ui-panelgrid-blank">
+										<p:spacer />
+										
+		
+			<p:commandButton validateClient="true" value="Asociar"
+				action="#{cc.attrs.asociarAction}" icon="fa fa-check"
+				styleClass="btn  btn-primary btn-sm" process="@parent @form @this"
+				update="@([id$=formPrincipalAscNotas]) @([id$=formPrincipal])"></p:commandButton>
+			<p:commandButton value="Cerrar"
+				oncomplete="PF('dlgAscNotas').hide();" icon="fa fa-close"
+				update="@([id$=formPrincipal])" styleClass="btn  btn-warning btn-sm"
+				process="@this"></p:commandButton>
+				</p:panelGrid>
+
+	</p:panel>
+
+</composite:implementation>
+</html>

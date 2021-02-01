@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateNoAuth.xhtml"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+	<f:metadata>
+		<f:viewAction action="#{logedBean.check}" />
+		<!-- 		<f:viewAction action="#{registroComprasController.onLoad}" /> -->
+	</f:metadata>
+
+	<ui:define name="title">CONSULTA MIS COMPRAS</ui:define>
+	<ui:define name="body">
+	
+		<f:event type="preRenderView"
+			listener="#{menuLateralBean.actualizaMenuLateral()}" />
+
+			<h:form id="frmBusqueda">
+				<sre:ComponenteConsultaCompras ComponenteEsVisibleLimpiar="true"
+					id="comBuscadorConsulta" ComponenteNameUpdate=":frmBusqueda:comBuscador">
+				</sre:ComponenteConsultaCompras>
+
+			</h:form>
+
+	</ui:define>
+</ui:composition>

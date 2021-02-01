@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateAuth.xhtml"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor">
+
+	<f:metadata>
+		<f:viewAction action="#{logedBean.check}" />
+	</f:metadata>
+
+	<ui:define name="title">
+      AGENTE DE RETENCIÓN
+    </ui:define>
+
+
+	<ui:define name="body">
+		<script type="text/javascript">
+			function controlClick(id) {
+				$("button[id$='"+id+"']").click();
+			}
+		</script>
+		<f:event type="preRenderView"
+			listener="#{menuLateralBean.actualizaMenuLateral()}" />
+<!-- 		<h:form id="formPrincipal"> -->
+	
+	<p:panel id="resultsPanel" styleClass="box-primary" header="Gestión Formularios 110">
+						<p:tabView id="tabGestionFormulariosAgente" dynamic="true" cache ="true" 
+							binding="#{tabView}"
+							>
+<!-- 							activeIndex="#{tabAutogestionDespacho.activeTabIndex} -->
+							<p:ajax event="tabChange"
+								listener="#{agenteRetencionController.onTabChanged}" update="op0,op1,op2, op3"/>
+							<p:tab title="Recepción de Formularios" id="tab0" rendered="#{agenteRetencionController.esGestorUsuarios or agenteRetencionController.esUsuarioReceptor}">
+								<p:outputPanel id="op0">
+								<sre:ComponenteRecepcionFormularios id="cmpRecepcionFormularios"></sre:ComponenteRecepcionFormularios>
+								</p:outputPanel>
+							</p:tab>
+							<p:tab title="Formularios Aceptados" id="tab1" rendered="#{agenteRetencionController.esGestorUsuarios or agenteRetencionController.esUsuarioReceptor or agenteRetencionController.esConsolidador}">
+								<p:outputPanel id="op1">
+								<sre:ComponenteFormulariosAceptados id="cmpAceptados"></sre:ComponenteFormulariosAceptados>
+								</p:outputPanel>
+							</p:tab>
+								<p:tab title="Formularios Rechazados" id="tab2" rendered="#{agenteRetencionController.esGestorUsuarios or agenteRetencionController.esUsuarioReceptor}">
+								<p:outputPanel id="op2">
+									<sre:ComponenteFormulariosRechazados id="cmpRechazados"></sre:ComponenteFormulariosRechazados>
+								</p:outputPanel>
+							</p:tab>
+							<p:tab title="Formularios Totalizados" id="tab3"  rendered="#{agenteRetencionController.esConsolidador}" >
+								<p:outputPanel id="op3">
+									<sre:ComponenteFormulariosConsolidados id="cmpConsolidados"></sre:ComponenteFormulariosConsolidados>
+								</p:outputPanel>
+							</p:tab>
+							</p:tabView>
+					</p:panel>
+
+
+	</ui:define>
+</ui:composition>

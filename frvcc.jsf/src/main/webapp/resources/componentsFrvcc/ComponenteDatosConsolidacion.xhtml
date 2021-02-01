@@ -1,0 +1,140 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:p="http://primefaces.org/ui"
+	  xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:w="http://xmlns.jcp.org/jsf/passthrough">
+<!-- INTERFACE -->
+<composite:interface>
+	<composite:attribute name="componenteDatosConsolidacion" required="false" />
+</composite:interface>
+<!-- IMPLEMENTATION -->
+
+<composite:implementation>
+	<p:dialog id="dlgVerTotales" header="TOTALES DEL PERIODO"
+			  widgetVar="dlgVerTotales" modal="true" scroll="false"
+			  appendTo="@(body)" width="60%" height='80%' resizable="false">
+		<h:form id="formConsolidar">
+			<p:panel id="pnlDatosTotales" styleClass="box-primary ui-fluid"
+					 header="Datos Agente de Retención">
+				<p:panelGrid columns="2"
+							 columnClasses="ui-grid-col-4,ui-grid-col-8"
+							 layout="grid" styleClass="ui-panelgrid-blank">
+					<p:outputLabel value="FECHA DE IMPRESIÓN:" />
+					<h:outputText id="txtFechaImpresion"
+								   value="#{componenteFormulariosAceptadosController.consolidador.fechaImpresion}"
+								   readonly="true">
+						<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<p:outputLabel value="NIT:" />
+						<h:outputText
+								value="#{componenteFormulariosAceptadosController.consolidador.nitAgente}"
+								readonly="true" />
+					<p:outputLabel value="RAZÓN SOCIAL:" />
+						<h:outputText
+								value="#{componenteFormulariosAceptadosController.consolidador.razonSocialAgente}" />
+					<p:outputLabel value="ADMINISTRACIÓN:" />
+						<h:outputText
+								value="#{componenteFormulariosAceptadosController.consolidador.administracionDescripcion}" />
+					<p:outputLabel value="PERIODO:" />
+						<h:outputText
+								value="#{componenteFormulariosAceptadosController.consolidador.periodoDescripcion}" />
+					<p:outputLabel value="GESTIÓN:" />
+						<h:outputText id="idGestion"
+									   value="#{componenteFormulariosAceptadosController.consolidador.gestion}" />
+				</p:panelGrid>
+			</p:panel>
+			<p:panel id="pnlTotalesPeriodo" styleClass="box-primary ui-fluid">
+				<p:dataTable var="consolidacion"
+							 emptyMessage="Sin registros"
+							 value="#{componenteFormulariosAceptadosController.listaConsolidaciones}"
+							 id="tblFacturas"
+							 styleClass="table table-striped table-bordered table-hover table-sm"
+							 widgetVar="tblFacturas" rowIndexVar="rowIndex"
+							 toggleable="true">
+
+					<p:column headerText="DEPARTAMENTO" style="text-align: center" >
+						<h:outputText value="#{consolidacion.departamentoSucursal}"  />
+						<f:facet id="footer" name="footer">
+							<h:outputText id="total"
+										  value="TOTAL">
+							</h:outputText>
+						</f:facet>
+					</p:column>
+					<p:column headerText="DIRECCION SUCURSAL" style="text-align: center">
+						<h:outputText value="#{consolidacion.sucursal} - #{consolidacion.direccionSucursal}" />
+						<f:facet id="footer" name="footer">
+							<h:outputText id="direcSuc"
+										  value=" ">
+							</h:outputText>
+						</f:facet>
+					</p:column>
+					<p:column headerText="CANTIDAD DE F-110 V4 ACEPTADOS" style="text-align: center">
+						<h:outputText value="#{consolidacion.cantidadFormularios}"/>
+						<f:facet id="footer" name="footer" >
+							<h:outputText id="cantidadForm110"
+										  value="#{componenteFormulariosAceptadosController.consolidador.cantidadFormularios}">
+							</h:outputText>
+						</f:facet>
+					</p:column>
+					<p:column headerText="TOTAL DETERMINACIÓN DE PAGO A CUENTA">
+						<h:outputText value="#{consolidacion.totalDeterminacionPagoCuenta}" style="float:right">
+							<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+						</h:outputText>
+						<f:facet id="footer" name="footer">
+							<h:outputText id="detPagoCuenta"
+										  value="#{componenteFormulariosAceptadosController.consolidador.totalDeterminacionPagoCuenta}"
+										  style="float:right">
+								<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+							</h:outputText>
+						</f:facet>
+					</p:column>
+					<p:column headerText="TOTAL PAGO A CUENTA FACTURAS SIETE RG">
+						<h:outputText value="#{consolidacion.totalPagoCuenta}" style="float:right">
+						<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+					</h:outputText>
+						<f:facet id="footer" name="footer">
+							<h:outputText id="pagoCuenta7rg"
+										  value="#{componenteFormulariosAceptadosController.consolidador.totalPagoCuenta}"
+										  style="float:right">
+								<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+							</h:outputText>
+						</f:facet>
+					</p:column>
+
+				</p:dataTable>
+				<p:panelGrid columns="4"
+							 columnClasses="ui-grid-col-3,ui-grid-col-3, ui-grid-col-3,ui-grid-col-3"
+							 layout="grid" styleClass="ui-panelgrid-blank">
+					<p:spacer/>
+					<p:spacer/>
+					<p:commandButton value="Totalizar" icon="fa fa-fw fa-check" styleClass="btn btn-success btn-sm"
+									 actionListener="#{componenteFormulariosAceptadosController.siConsolidar(componenteFormulariosAceptadosController.consolidador)}">
+						<p:confirm header="Confirmar"
+								   message="Estos totales serán los mismos que informe en su planilla tributaria ¿Está seguro de totalizar el periodo
+								   #{componenteFormulariosAceptadosController.consolidador.periodo}/#{componenteFormulariosAceptadosController.consolidador.gestion}?. Si continua no podrá cambiar esta información."
+								   icon="ui-icon-alert" />
+
+					</p:commandButton>
+					<p:commandButton value="Cerrar" icon="fa fa-close"
+									 styleClass="btn btn-warning btn-sm"
+									 onclick="PF('dlgVerTotales').hide();">
+					</p:commandButton>
+				</p:panelGrid>
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+								 responsive="true" position="center center" appendTo="@(body)">
+
+					<p:commandButton value="Si"
+									 styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+									 icon="fa fa-check" />
+					<p:commandButton value="No"
+									 styleClass="ui-confirmdialog-no btn-warning btn-sm"
+									 icon="fa fa-close" />
+				</p:confirmDialog>
+			</p:panel>
+		</h:form>
+
+	</p:dialog>
+</composite:implementation>
+</html>

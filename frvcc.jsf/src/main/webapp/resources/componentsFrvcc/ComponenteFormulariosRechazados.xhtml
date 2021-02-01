@@ -1,0 +1,504 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:w="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor"
+	xmlns:of="http://omnifaces.org/functions">
+<!-- INTERFACE -->
+<composite:interface>
+	<composite:attribute name="ComponenteEsVisibleLimpiar" />
+	<composite:attribute name="ComponenteButtonLimpiar" required="false"
+		method-signature="void DefaultMetod()" />
+	<composite:attribute name="ComponenteNameUpdate" />
+</composite:interface>
+
+<!-- IMPLEMENTATION -->
+<composite:implementation>
+	<h:form id="formPrincipalRecepcion">
+		<p:panel header="Formularios Rechazados" toggleable="true"
+			id="idBusqueda" styleClass="card box-primary">
+			<p:panelGrid id="pnlSuc" columns="4"
+						 columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+						 layout="grid" styleClass="ui-fluid" >
+				<p:outputLabel rendered="#{componenteFormulariosAceptadosController.esGestorUsuarios}"
+							   class="control-label" value="Departamento:" />
+				<p:row rendered="#{componenteFormulariosAceptadosController.esGestorUsuarios}">
+					<p:selectOneMenu value="#{componenteFormulariosRechazadosController.lugarDepartamento}"
+									 id="lugarDepartamento" rendered="#{componenteFormulariosAceptadosController.esGestorUsuarios}">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+						<f:selectItem itemValue="1" itemLabel="CHUQUISACA" />
+						<f:selectItem itemValue="2" itemLabel="LA PAZ" />
+						<f:selectItem itemValue="3" itemLabel="COCHABAMBA" />
+						<f:selectItem itemValue="4" itemLabel="ORURO" />
+						<f:selectItem itemValue="5" itemLabel="POTOSI" />
+						<f:selectItem itemValue="6" itemLabel="TARIJA" />
+						<f:selectItem itemValue="7" itemLabel="SANTA CRUZ" />
+						<f:selectItem itemValue="8" itemLabel="BENI" />
+						<f:selectItem itemValue="9" itemLabel="PANDO" />
+						<f:selectItem itemValue="10" itemLabel="TODOS" />
+						<p:ajax event="change" update="pnlSuc"
+								listener="#{componenteFormulariosRechazadosController.consultaSucursalesContribuyente}" />
+					</p:selectOneMenu>
+				</p:row>
+				<p:outputLabel for="sucEmpleador" class="control-label"
+							   value="Sucursal:" />
+				<p:row  >
+					<p:selectOneMenu id="sucEmpleador" style="width:100%"
+									 value="#{componenteFormulariosRechazadosController.numeroSucursal}"
+									 filter="true" filterMatchMode="startsWith">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									  noSelectionOption="true" />
+						<f:selectItems
+								value="#{componenteFormulariosRechazadosController.listaSucursales}"
+								var="sucursal" itemLabel="#{sucursal.numeroSucursal} - #{sucursal.direccion}"
+								itemValue="#{sucursal.numeroSucursal}" />
+						<p:clientValidator event="change" />
+					</p:selectOneMenu>
+					<p:message for="sucEmpleador" />
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="pnlCriterios" columns="6"
+				columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2"
+				layout="grid" styleClass="ui-fluid">
+				<p:outputLabel value="Periodo Año:" />
+				<p:selectOneMenu
+					value="#{componenteFormulariosRechazadosController.periodoAnio}"
+					id="txtPeriodoAnio">
+					<f:selectItems
+						value="#{of:createIntegerArray(of:formatDate(now,'yyyy')+1,of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+				</p:selectOneMenu>
+				<p:row>
+				<p:outputLabel value="Periodo Mes: " />
+				<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+				</p:row>
+				<p:selectOneMenu
+					value="#{componenteFormulariosRechazadosController.periodoMes}"
+					id="txtPeriodo">
+					<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+					<f:selectItem itemValue="1" itemLabel="ENERO" />
+					<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+					<f:selectItem itemValue="3" itemLabel="MARZO" />
+					<f:selectItem itemValue="4" itemLabel="ABRIL" />
+					<f:selectItem itemValue="5" itemLabel="MAYO" />
+					<f:selectItem itemValue="6" itemLabel="JUNIO" />
+					<f:selectItem itemValue="7" itemLabel="JULIO" />
+					<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+					<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+					<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+					<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+					<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+				</p:selectOneMenu>
+				<p:outputLabel value="CI Dependiente:" />
+				<p:row>
+					<p:inputText id="txtCi" w:placeholder="Ci Dependiente"
+						maxlength="13" readonly="false"
+						validatorMessage="Debe seleccionar un valor"
+						requiredMessage="Campo requerido"
+						value="#{componenteFormulariosRechazadosController.ciDependiente}"
+						converterMessage="Debe ser un N° Válido">
+						<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+						<p:clientValidator event="blur" />
+						<p:clientValidator event="keyup" />
+					</p:inputText>
+					<p:message for="txtCi"></p:message>
+				</p:row>
+				<p:outputLabel value="Fecha Rechazo" />
+				<p:row>
+					<p:calendar
+						value="#{componenteFormulariosRechazadosController.fechaRecepcion}"
+						id="txtFechaRecepcion" showOn="button" pattern="dd/MM/yyyy"
+						maxdate="to_day" mask="99/99/9999">
+						<f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+					</p:calendar>
+					<p:message for="txtFechaRecepcion"></p:message>
+				</p:row>
+				<p:outputLabel value="N° Orden:" />
+				<p:row>
+					<p:inputText id="txtnumeroOrden" w:placeholder="N° Orden"
+						maxlength="13" readonly="false"
+						validatorMessage="Debe seleccionar un valor"
+						requiredMessage="Campo requerido"
+						value="#{componenteFormulariosRechazadosController.numeroOrden}"
+						converterMessage="Debe ser un número Válido">
+						<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+						<p:clientValidator event="blur" />
+						<p:clientValidator event="keyup" />
+					</p:inputText>
+					<p:message for="txtnumeroOrden"></p:message>
+				</p:row>
+				<p:row>
+				<p:outputLabel value="Tipo Formulario:" />
+				<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+				</p:row>
+				<p:row>
+					<p:selectOneMenu style="width:100%"
+									 value="#{componenteFormulariosRechazadosController.tipoUso}"
+									 id="tipoUso"
+									 required="true"
+									 requiredMessage="Dato Requerido">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									  noSelectionOption="true" />
+						<f:selectItems
+								value="#{componenteFormulariosRechazadosController.listaTipoUso}"
+								var="tipo" itemLabel="#{tipo.descripcion}"
+								itemValue="#{tipo.codigoClasificador}" />
+						<p:clientValidator event="change" />
+					</p:selectOneMenu>
+					<p:message for="tipoUso"></p:message>
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="pngBotones" columns="3"
+						 columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+						 layout="grid" styleClass="ui-fluid">
+				<p:row>
+					<p:outputLabel style="color:dodgerblue;">Los campos marcados con (*) son obligatorios para la búsqueda</p:outputLabel>
+				</p:row>
+				<p:commandButton id="idBuscar" value="Buscar" icon="fa fa-search"
+					styleClass="btn btn-primary btn-sm"
+								 rendered="#{componenteFormulariosRechazadosController.listaSucursalesUsuarios.size()>0 or componenteFormulariosRechazadosController.esGestorUsuarios}"
+					actionListener="#{componenteFormulariosRechazadosController.onBuscar}"
+					update="@([id$=idBusqueda]) btnDownloadExcel idImprimir"
+					process="@this lugarDepartamento txtPeriodo txtPeriodoAnio txtCi txtFechaRecepcion txtnumeroOrden sucEmpleador tipoUso">
+				</p:commandButton>
+				<p:commandButton id="idLimpiar" value="Limpiar"
+					styleClass="btn btn-warning btn-sm" process="@this"
+					actionListener="#{componenteFormulariosRechazadosController.onLimpiar}"
+					update="pnlSuc pnlCriterios dtFormularios pnlBotones">
+				</p:commandButton>
+			</p:panelGrid>
+			<p:separator />
+
+			<p:dataTable id="dtFormularios" emptyMessage="Sin registros"
+				var="formulario" paginator="true" lazy="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="{totalRecords} registros"
+				rowsPerPageTemplate="20,50,100" rowIndexVar="rowIndex" rows="20"
+				paginatorPosition="bottom" rowKey="#{factura.id}"
+				value="#{componenteFormulariosRechazadosController.formulariosLazy}"
+				styleClass="table table-striped table-borderedtable-hovertable-sm"
+				disabledSelection="#{formulario.estadoFormularioId ne 'REG'}"
+				rowSelectMode="checkbox">
+
+
+				<p:column style="width:2%;text-align: center">
+					<f:facet name="header">
+						<h:outputText value="N°"></h:outputText>
+					</f:facet>
+					<h:outputText value="#{rowIndex+1}"></h:outputText>
+				</p:column>
+				<p:column headerText="Periodo" style="width:10%">
+					<h:outputText value="0"  rendered="#{!(formulario.mesPeriodo >= 10)}"/>
+					<h:outputText value="#{formulario.mesPeriodo}" />
+					<h:outputText value="/#{formulario.anioPeriodo}" />
+				</p:column>
+				<p:column headerText="Usuario" style="width:10%">
+					<h:outputText value="#{formulario.nombreReceptor}" style="float:right"/>
+				</p:column>
+				<p:column headerText="N° Orden" style="width:10%">
+					<h:outputText value="#{formulario.numeroOrden}" style="float:right"/>
+				</p:column>
+				<p:column headerText="CI Dependiente" style="width:10%">
+					<h:outputText value="#{formulario.nitCi}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Cod.Dependiente" style="width:10%">
+					<h:outputText value="#{formulario.codigoDependiente}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Nombres y Apellidos" style="width:30%">
+					<h:outputText value="#{formulario.razonSocial}" />
+				</p:column>
+				<p:column headerText="Cant. Facturas Prod. Nal." style="width:10%">
+					<h:outputText value="#{formulario.cantidadComprasCfIpn}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Cant. Otras Facturas" style="width:10%">
+					<h:outputText value="#{formulario.cantidadComprasCfOtras}" style="float:right" />
+				</p:column>
+				<p:column headerText="Cant. Facturas SIETE-RG" style="width:10%">
+					<h:outputText value="#{formulario.cantidadComprasSdCf}" style="float:right"/>
+				</p:column>
+				<p:column headerText="Total Importe Facturas Prod. Nal."
+					style="width:10%">
+					<h:outputText value="#{formulario.totalComprasCfIpn}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Total Importe Otras Facturas"
+					style="width:10%">
+					<h:outputText value="#{formulario.totalComprasCfOtras}" style="float:right">
+						<f:convertNumber locale="en-US" pattern="#,##0"/>
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Total Importe Facturas SIETE-RG"
+					style="width:10%">
+					<h:outputText value="#{formulario.totalComprasSdCf}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Determinación de Pago a Cuenta"
+					style="width:10%; text-align: center">
+					<h:outputText value="#{formulario.determinacionPagoCf}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Pago a Cuenta Facturas SIETE-RG"
+					style="width:10%; text-align: center">
+					<h:outputText value="#{formulario.determinacionPagoSdCf}" style="float:right">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Fecha Rechazo"
+					style="width:10%; text-align: center">
+					<h:outputText
+						value="#{formulario.fechaEstado}">
+						<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" style="float:right"/>
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Ver Detalle"
+					style="width:13%; text-align: center">
+					<p:commandLink oncomplete="PF('dlgVerDetalleR').show();"
+						id="btnVerDetalle" process="@this" title="Ver Facturas">
+						<span class="fa fa-eye"></span>
+						<p:ajax event="click" process="@this"
+							update="#{p:component('dlgVerDetalleR')}"
+							listener="#{componenteFormulariosRechazadosController.obtenerFacturasSeleccionadas(formulario)}" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+			<p:panelGrid id="pnlBotones" columns="3"
+				columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+				layout="grid" styleClass="ui-fluid">
+				<p:spacer />
+				
+				<p:commandButton ajax="false" title="Descargar" value="Descargar"
+					id="btnDownloadExcel"
+					rendered="#{componenteFormulariosRechazadosController.consultaRealizada}"
+					actionListener="#{componenteFormulariosRechazadosController.ExcelFormulariosRechazados()}"
+					icon="fa fa-fw fa-download" styleClass="btn btn-success btn-sm">
+					<p:fileDownload
+						value="#{componenteFormulariosRechazadosController.download}" />
+				</p:commandButton>
+				<p:commandButton
+						rendered="#{componenteFormulariosRechazadosController.consultaRealizada}"
+						id="idImprimir"
+						icon="fa fa-print"
+						value="Imprimir Consulta"
+						process="@this"
+						styleClass="btn btn-danger btn-sm"
+						actionListener="#{componenteFormulariosRechazadosController.generarReporteFormulario}"
+						oncomplete="controlClick('btnVisorPdf');" />
+			</p:panelGrid>
+		</p:panel>
+	</h:form>
+	<p:dialog id="dlgVerDetalleR" header="DETALLE DEL FORMULARIO"
+		widgetVar="dlgVerDetalleR" modal="true" scroll="false"
+		appendTo="@(body)" width="80%" height='80%' resizable="false">
+		<h:form id="formAsocFact">
+			<p:panel id="pnlDatosformulario" styleClass="box-primary ui-fluid"
+				header="Datos Formulario">
+				<p:panelGrid columns="4"
+					columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+					layout="grid" styleClass="ui-panelgrid-blank">
+
+					<p:outputLabel value="CI Dependiente:" />
+					<p:row>
+						<p:outputLabel
+							value="#{componenteFormulariosRechazadosController.formularioSeleccionado.nitCi}"
+							readonly="true" />
+					</p:row>
+					<p:outputLabel value="Nombre Dependiente:" />
+					<p:row>
+						<p:outputLabel
+							value="#{componenteFormulariosRechazadosController.formularioSeleccionado.razonSocial}" />
+					</p:row>
+					<p:outputLabel value="Periodo:" />
+					<p:row>
+
+						<p:selectOneMenu id="cbMes" disabled="true"
+							value="#{componenteFormulariosRechazadosController.formularioSeleccionado.mesPeriodo}">
+							<f:selectItem itemValue="#{null}"
+								itemLabel="----- SELECCIONE UN PERIODO -----" />
+							<f:selectItem itemValue="1" itemLabel="ENERO" />
+							<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+							<f:selectItem itemValue="3" itemLabel="MARZO" />
+							<f:selectItem itemValue="4" itemLabel="ABRIL" />
+							<f:selectItem itemValue="5" itemLabel="MAYO" />
+							<f:selectItem itemValue="6" itemLabel="JUNIO" />
+							<f:selectItem itemValue="7" itemLabel="JULIO" />
+							<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+							<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+							<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+							<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+							<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+						</p:selectOneMenu>
+					</p:row>
+					<p:outputLabel value="Gestión:" />
+					<p:row>
+						<p:outputLabel
+							value="#{componenteFormulariosRechazadosController.formularioSeleccionado.anioPeriodo}" />
+					</p:row>
+					<p:outputLabel value="NIT Empleador" />
+					<p:row>
+						<p:outputLabel id="niEmpleador"
+							value="#{componenteFormulariosRechazadosController.formularioSeleccionado.nitEmpleador}" />
+					</p:row>
+					<p:outputLabel value="Fecha Presentación:" />
+					<p:row>
+						<p:outputLabel id="txtFechaEmision"
+							value="#{componenteFormulariosRechazadosController.formularioSeleccionado.fechaPresentacion}"
+							readonly="true">
+							<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="pnlAsocFac" styleClass="box-primary ui-fluid"
+				toggleable="true" header="Compras">
+				<p:dataTable var="factura"
+					value="#{componenteFormulariosRechazadosController.listaComrasFomulario}"
+					id="tblFacturas" emptyMessage="No se encontraron facturas"
+					styleClass="table table-striped table-bordered table-hover table-sm"
+					widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="10"
+					paginator="true" sortMode="multiple" paginatorPosition="bottom"
+					rowsPerPageTemplate="10,20,50,100" paginatorAlwaysVisible="false"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="{totalRecords} registros"
+					toggleable="true">
+					<p:column headerText="N°" styleClass="ui-icon-table">
+						<p:outputLabel value="#{rowIndex+1}" />
+					</p:column>
+					<p:column headerText="NIT Proveedor">
+						<h:outputText value="#{factura.nitProveedor}" style="float:right"/>
+					</p:column>
+					<p:column headerText="Razón Social">
+						<h:outputText value="#{factura.razonSocialProveedor}" />
+					</p:column>
+					<p:column headerText="N° Factura">
+						<h:outputText value="#{factura.numeroFactura}" style="float:right"/>
+					</p:column>
+					<p:column headerText="N° Autorización / CUF">
+						<h:outputText value="#{factura.codigoAutorizacion}" style="float:right"/>
+					</p:column>
+					<p:column headerText="Fecha Emisión">
+						<h:outputText value="#{factura.fechaFactura}">
+							<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" style="float:right"/>
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Importe Total">
+						<h:outputText value="#{factura.marcaEspecialId=='7RG'?factura.importeTotalCompra: factura.importeBaseCf}" style="float:right">
+							<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Cod. Control">
+						<h:outputText value="#{factura.codigoControl}" />
+					</p:column>
+					<p:column headerText="Tipo Factura">
+						<h:outputText
+							value="#{factura.modalidadId=='FEL'or factura.modalidadId=='FCL'or factura.modalidadId=='FPW'?'LIN ':''}" />
+						<h:outputText
+							value="#{factura.modalidadId=='ELE' or factura.modalidadId=='CIC'?'E ':''}" />
+						<h:outputText
+							value="#{factura.marcaEspecialId=='IPN' ?'PROD-NAL ':''}" />
+						<h:outputText value="#{factura.marcaEspecialId=='7RG' ?'7RG ':''}" />
+					</p:column>
+				</p:dataTable>
+
+
+			</p:panel>
+			<p:panel header="Detalles Totales" styleClass="box-primary ui-fluid">
+				<p:panelGrid columns="6"
+					columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2, ui-grid-col-2,ui-grid-col-2, ui-grid-col-2"
+					layout="grid" styleClass="ui-panelgrid-blank">
+					<p:outputLabel value="Cantidad Facturas Prod. Nal:" />
+					<p:inputText id="CantidadIPN" style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.cantidadComprasCfIpn}"
+						readonly="true" />
+					<p:outputLabel value="Total Importe Facturas Prod. Nal.:" />
+					<p:inputText id="SumaTotalIpn" style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.totalComprasCfIpn}"
+						readonly="true" >
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+					<p:outputLabel value="Det. Pago a Cuenta Prod. Nal.:" />
+					<p:inputText style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.determinacionPagoCfIpn}"
+						readonly="true" >
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+					<p:outputLabel value="Cantidad Otras Facturas:" />
+					<p:inputText id="CantidadOtras" style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.cantidadComprasCfOtras}"
+						readonly="true" />
+					<p:outputLabel value="Total Importe Otras Facturas:" />
+					<p:inputText id="SumaTotalOtras" style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.totalComprasCfOtras}"
+						readonly="true" >
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+					<p:outputLabel value="Det. Pago a Cuenta Otras Facturas:" />
+					<p:inputText style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.determinacionPagoCfOtras}"
+						readonly="true" >
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:outputLabel value="Det. Pago a Cuenta" />
+					<p:inputText style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.determinacionPagoCf}"
+						readonly="true">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+				</p:panelGrid>
+				<p:separator />
+				<p:panelGrid columns="6"
+					columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2, ui-grid-col-2,ui-grid-col-2, ui-grid-col-2"
+					layout="grid" styleClass="ui-panelgrid-blank">
+
+					<p:outputLabel value="Cantidad Total Facturas SIETE-RG" />
+					<p:inputText id="cantidads" style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.cantidadComprasSdCf}"
+						readonly="true" />
+					<p:outputLabel value="Total Importe Facturas SIETE-RG:" />
+					<p:inputText id="SumaTotal3" style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.totalComprasSdCf}"
+						readonly="true">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+					<p:outputLabel value="Pago a Cuenta por Facturas SIETE-RG:" />
+					<p:inputText style="text-align: right"
+						value="#{componenteFormulariosRechazadosController.formularioSeleccionado.determinacionPagoSdCf}"
+						readonly="true">
+						<f:convertNumber  locale="en-US" pattern="#,##0" />
+						</p:inputText>
+
+
+				</p:panelGrid>
+				<p:spacer></p:spacer>
+				<p:panelGrid id="panelBotones" columns="2"
+					columnClasses="ui-grid-col-10,ui-grid-col-2"
+					layout="grid" styleClass="ui-panelgrid-blank">
+					<p:spacer />
+					<p:commandButton value="Cerrar" icon="fa fa-close" styleClass="btn btn-warning btn-sm"
+						onclick="PF('dlgVerDetalleR').hide();" />
+				</p:panelGrid>
+
+			</p:panel>
+
+			<p:panel visible="false">
+				<visor:visorPdf  id="btnVisorPdf" esVisibleBoton="true"
+								 nombreWidgetVar="idFormularioDlg"
+								 archivoB64="#{componenteFormulariosRechazadosController.reportesController.respuestaBase64}"
+								 txtTitulo="Reporte Generado">
+				</visor:visorPdf>
+			</p:panel>
+		</h:form>
+
+	</p:dialog>
+</composite:implementation>
+</html>

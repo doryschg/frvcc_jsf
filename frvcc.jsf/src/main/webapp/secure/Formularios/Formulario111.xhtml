@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:p="http://primefaces.org/ui"
+				xmlns:adm="http://github.com/adminfaces"
+				template="/common/templateAuth.xhtml"
+				xmlns:c="http://java.sun.com/jsp/jstl/core"
+				xmlns:ldc="http://example.com/LocalDateConverter"
+				xmlns:of="http://omnifaces.org/functions"
+				xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+				xmlns:visor="http://java.sun.com/jsf/composite/visor">
+
+
+
+	<f:metadata>
+		<f:viewAction action="#{logedBean.check}" />
+	</f:metadata>
+
+	<ui:define name="title" >
+		FORMULARIO 111 RE-IVA
+	</ui:define>
+
+
+	<ui:define name="body">
+
+		<script type="text/javascript">
+			function controlClick(id) {
+				$("button[id$='"+id+"']").click();
+			}
+		</script>
+
+		<script type="text/javascript">
+			function abrirVisorReporte() {
+				if (document.getElementById('formPrincipal:btnVisorPdf:btnVisorPdf') != undefined) {
+					document.getElementById('formPrincipal:btnVisorPdf:btnVisorPdf').click();
+				}
+			}
+		</script>
+		<script type="text/javascript">
+			window.addEventListener('beforeunload', function(e) {
+
+				var element = document.getElementById('formPrincipal:btnGuardar');
+				console.log(element);
+				if(element) {
+					delete e['returnValue'];
+					//following two lines will cause the browser to ask the user if they
+					//want to leave. The text of this dialog is controlled by the browser.
+					//e.preventDefault(); //per the standard
+					e.returnValue = 'Ha intentado salir de esta pagina. Si ha realizado algun cambio en los campos sin hacer clic en el boton Guardar, los cambios se perderan. Seguro que desea salir de esta pagina?'; //required for Chrome
+				}
+				//else: user is allowed to leave without a warning dialog
+			});
+		</script>
+		<f:event type="preRenderView"
+				 listener="#{menuLateralBean.actualizaMenuLateral()}" />
+		<h:form id="formPrincipal">
+			<p:panel id="pnlFormularios" styleClass="box-primary ui-fluid">
+				<p:panelGrid columns="5"
+							 columnClasses="ui-grid-col-1,ui-grid-col-3,ui-grid-col-1, ui-grid-col-3,ui-grid-col-2"
+							 layout="grid" styleClass="ui-panelgrid-blank">
+					<p:outputLabel value="Gestión: " />
+					<p:selectOneMenu value="#{formulario120Controller.anioPeriodo}"
+									 id="cbAnio">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+									  noSelectionOption="true" />
+						<f:selectItems
+								value="#{of:createIntegerArray(of:formatDate(now,'yyyy'),of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+						<p:ajax event="change" update="formPrincipal"
+								listener="#{formulario120Controller.cargarFormulariosPeriodoSeleccionado()}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Periodo: " />
+					<p:selectOneMenu value="#{formulario120Controller.mesPeriodo}"
+									 id="cbMes">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+						<f:selectItem itemValue="1" itemLabel="ENERO" />
+						<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+						<f:selectItem itemValue="3" itemLabel="MARZO" />
+						<f:selectItem itemValue="4" itemLabel="ABRIL" />
+						<f:selectItem itemValue="5" itemLabel="MAYO" />
+						<f:selectItem itemValue="6" itemLabel="JUNIO" />
+						<f:selectItem itemValue="7" itemLabel="JULIO" />
+						<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+						<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+						<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+						<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+						<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+						<f:selectItem itemValue="13" itemLabel="TODOS" />
+						<p:ajax event="change" update="formPrincipal"
+								listener="#{formulario120Controller.cargarFormulariosPeriodoSeleccionado()}" />
+					</p:selectOneMenu>
+					<p:commandButton id="btnAgregarFormulario" value="Generar Formulario"
+									 styleClass="btn  btn-success btn-sm"
+									 style="float:center; width:100%;" process="@this"
+									 rendered="#{formulario120Controller.beneficiario.pagoAutomaticoId == 'N'}"
+									 oncomplete="PF('dlgAgregaFormulario').show();"
+									 update="pnlFormularios" icon="fa fa-plus">
+						<p:ajax event="click" process="@this"
+								listener="#{formulario120Controller.nuevoFormulario()}" />
+					</p:commandButton>
+					<p:spacer />
+					<p:spacer />
+				</p:panelGrid>
+				<p:panel
+						rendered="#{!(formulario120Controller.vListaFormularios.size()>0)}">
+					<p:outputLabel
+							value="No se encontraron formularios generados para el periodo y año especificados." />
+				</p:panel>
+				<p:panel header="FORMULARIO GENERADO" id="pnlFormReg"
+						 rendered="#{(formulario120Controller.vListaFormularios.size()>0)}"
+						 toggleable="true" styleClass="ui-fluid">
+					<p:panelGrid id="formulariosPeriodo" columns="4"
+								 columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
+								 layout="grid" styleClass="ui-panelgrid-blank">
+						<c:forEach items="#{formulario120Controller.vListaFormularios}"
+								   var="formulario">
+							<p:commandLink process="@this"
+										   actionListener="#{formulario120Controller.cargarDetalleFormulario(formulario)}"
+										   update="pnlDetalleFormulario formPrincipal"
+										   title="Ver Detalle: #{formulario.nombreFormulario} &#10; #{formulario.nombreEmpleador}">
+								<div
+										class="info-box bg-#{(formulario.estadoFormularioId == 'REG') ? 'olive' :(formulario.estadoFormularioId == 'DEC') ? 'teal':(formulario.estadoFormularioId == 'ACP') ? 'green':'red'}">
+									<span class="info-box-icon"> <i class="fa fa-newspaper-o"></i>
+									</span>
+									<div class="info-box-content">
+									<span>Monto Sujeto A Devolución: <p:outputLabel
+											value="#{formulario120Controller.beneficiario.totalSalario.compareTo(formulario.totalComprasCfOtras).toString() == '1' ? formulario.totalComprasCfOtras : formulario120Controller.beneficiario.totalSalario}">
+												<f:convertNumber locale="en-US" pattern="#,##0" />
+											</p:outputLabel>
+									</span><br></br>
+
+										<span>Re-Iva: <p:outputLabel
+												value="#{formulario120Controller.beneficiario.totalSalario.compareTo(formulario.totalComprasCfOtras).toString() == '1' ? formulario.determinacionPago : formulario120Controller.beneficiario.totalSalario.multiply(0.05)}">
+												<f:convertNumber locale="en-US" pattern="#,##0" />
+											</p:outputLabel>
+										</span>
+										<span class="progress-description">
+											#{clasificadorController.descripcionEstadoFormularioByCodigo(formulario.estadoFormularioId)}
+										</span>
+
+									</div>
+								</div>
+							</p:commandLink>
+						</c:forEach>
+
+					</p:panelGrid>
+				</p:panel>
+
+			</p:panel>
+
+			<p:panel id="pnlDetalleFormulario"
+					 rendered="#{formulario120Controller.verDetalle}"
+					 styleClass="box-primary ui-fluid" toggleable="true">
+				<p:panel
+						header="#{formulario120Controller.formulario.nombreFormulario}"
+						toggleable="true" styleClass="ui-fluid" menuTitle="true">
+					<p:panelGrid id="pngDetalleForm" columns="2" layout="grid"
+								 styleClass="ui-fluid">
+						<p:spacer rendered="#{formulario120Controller.formulario.estadoFormularioId=='REG' or formulario120Controller.formulario.estadoFormularioId=='RECH'}" />
+						<p:row rendered="#{formulario120Controller.formulario.estadoFormularioId=='REG' or formulario120Controller.formulario.estadoFormularioId=='RECH'}">
+							<span style="float:right; color:#a4a3a3;" >Para EDITAR los datos haga DOBLE CLICK en el campo</span>
+						</p:row>
+						<p:panelGrid id="datosDependiente" columns="2" columnClasses="ui-grid-col-5,ui-grid-col-7"
+									 layout="grid" styleClass="ui-fluid">
+							<f:facet name="header">
+								<p:row> <p:outputLabel class="control-label" value="DATOS BENEFICIARIO:" /> </p:row>
+							</f:facet>
+							<p:outputLabel class="control-label"
+										   value="Tipo Documento Identidad:" />
+							<p:row>
+								<p:outputLabel class="control-label"
+											   value="#{formulario120Controller.formulario.datosEspecificos.descripcionTipoDocumento}" />
+							</p:row>
+							<p:outputLabel class="control-label"
+										   value="Número Documento Identidad:" />
+							<h:outputLabel id="nroDocumento"
+										  value="#{formulario120Controller.formulario.datosEspecificos.numeroDocumento}" />
+							<p:outputLabel class="control-label"
+										   value="Complemento Documento:"
+										   rendered="#{formulario120Controller.formulario.datosEspecificos.tipoDocumento=='CI'}"/>
+							<p:row rendered="#{formulario120Controller.formulario.datosEspecificos.tipoDocumento=='CI'}">
+
+								<p:outputLabel id="complementodocumento" value="#{formulario120Controller.formulario.datosEspecificos.complementoDocumento != '' ? formulario120Controller.formulario.datosEspecificos.complementoDocumento : '(N/C)'}"
+								/>
+
+
+							</p:row>
+							<p:outputLabel id="lblLugarExp" class="control-label"
+										   value="Lugar de Expedición:"
+										   rendered="#{formulario120Controller.formulario.datosEspecificos.tipoDocumento=='CI'}" />
+							<p:row
+									rendered="#{formulario120Controller.formulario.datosEspecificos.tipoDocumento=='CI'}">
+
+								<p:outputLabel
+										id="lugarExp"
+										value="#{formulario120Controller.formulario.datosEspecificos.descripcionLugarExpedicion}"
+								/>
+
+
+							</p:row>
+							<p:outputLabel class="control-label" value="Nombre Dependiente:" />
+							<p:row>
+								<h:outputLabel id="nombreRazonsocial"
+											  value="#{formulario120Controller.formulario.razonSocial}" />
+							</p:row>
+							<p:outputLabel class="control-label"
+										   value="Dirección Dependiente:" />
+							<p:row>
+
+								<h:outputLabel id="domicilio"
+											   value="#{formulario120Controller.formulario.direccion}" />
+
+															</p:row>
+							<p:outputLabel class="control-label"
+										   value="NUA/CUA:" />
+							<p:row>
+								<p:outputLabel id="nuaCua"
+											 value="#{formulario120Controller.beneficiario.nuaCua}"
+											 style="text-transform:uppercase;" >
+								</p:outputLabel>
+								<p:message for="nuaCua" />
+							</p:row>
+							<p:outputLabel class="control-label"
+										   value="N° Cuenta:" />
+							<p:row>
+								<p:outputLabel id="cuenta"
+											   value="#{formulario120Controller.formulario.datosEspecificos.numeroCuenta}"
+
+											 style="text-transform:uppercase;" disabled="true">
+
+								</p:outputLabel>
+								<p:message for="cuenta" />
+							</p:row>
+							<p:outputLabel class="control-label"
+										   value="Banco:" />
+							<p:row>
+								<p:outputLabel id="banco"
+											   value="#{formulario120Controller.formulario.datosEspecificos.descripcionBanco}"
+											 style="text-transform:uppercase;" >
+
+								</p:outputLabel>
+							</p:row>
+
+						</p:panelGrid>
+
+						<p:panelGrid id="pndDatosAgente" columns="2" columnClasses="ui-grid-col-4,ui-grid-col-8"
+									 layout="grid" styleClass="ui-fluid">
+							<f:facet name="header">
+								<p:row> <p:outputLabel class="control-label" value="DATOS F-111:" /> </p:row>
+							</f:facet>
+							<p:outputLabel class="control-label" value="Lugar de Presentación:" />
+							<p:row>
+								<p:inplace id="inplAjaxlugar"
+										   editor="#{formulario120Controller.formulario.estadoFormularioId == 'REG'}"
+										   disabled="#{formulario120Controller.formulario.estadoFormularioId == 'ACP' or formulario120Controller.formulario.estadoFormularioId == 'DEC'}"
+										   saveLabel="Guardar" cancelLabel="Cancelar"
+										   label="#{formulario120Controller.formulario.datosEspecificos.departamentoDescripcion}">
+									<p:selectOneMenu id="lugar"
+													 value="#{formulario120Controller.formulario.lugarDepartamento}"
+													 required="true" requiredMessage="Dato requerido"
+													 disabled="#{formulario120Controller.formulario.estadoFormularioId == 'ACP' or formulario120Controller.formulario.estadoFormularioId == 'DEC'}">
+										<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" noSelectionOption="true" />
+										<f:selectItems
+												value="#{formulario120Controller.listaDepartamentos}"
+												var="depto" itemLabel="#{depto.nombre}"
+												itemValue="#{depto.departamentoId}" />
+									</p:selectOneMenu>
+									<p:ajax event="save"
+											listener="#{formulario120Controller.cambiarLugarPresentacion}"
+											update="formPrincipal" />
+									<p:message for="lugar" />
+								</p:inplace>
+							</p:row>
+							<p:outputLabel class="control-label"
+										   value="Fecha de Presentación:" />
+							<p:row>
+								<p:inplace event="dblclick"  id="inplAjaxFechaPresentacion"
+										   editor="#{formulario120Controller.formulario.estadoFormularioId == 'REG'}"
+										   disabled="#{formulario120Controller.formulario.estadoFormularioId == 'ACP' or formulario120Controller.formulario.estadoFormularioId == 'DEC'}"
+										   saveLabel="Guardar" cancelLabel="Cancelar"
+										   styleClass="ui-fluid">
+									<p:ajax event="save"
+											update="formPrincipal"
+											listener="#{formulario120Controller.cambiarFechaPresentacionFormulario()}">
+
+									</p:ajax>
+
+
+									<p:calendar  id="txtFechaPresentacion" required="true"
+												 requiredMessage="Dato Requerido"
+												 pattern="dd/MM/yyyy"
+												 mindate="#{formulario120Controller.minFechaPresentacion}"
+												 maxdate="#{formulario120Controller.maxFechaPresentacion}"
+												 readonlyInput="true"
+												 value="#{formulario120Controller.formulario.fechaPresentacion}"
+												 mask="99/99/9999" converterMessage="Formato incorrecto"
+									>
+										<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+										<p:clientValidator event="change" />
+										<p:clientValidator event="blur" />
+
+									</p:calendar>
+
+								</p:inplace>
+							</p:row>
+						</p:panelGrid>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel header="Detalle Facturas" toggleable="true"
+						 styleClass="ui-fluid">
+
+					<p:panelGrid id="pnlgDesAsociarTodas" columns="3"
+								 rendered="#{formulario120Controller.formulario.estadoFormularioId =='REG' or formulario120Controller.formulario.estadoFormularioId =='RECH'}"
+								 columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+								 layout="grid" styleClass="ui-panelgrid-blank">
+						<p:spacer />
+						<p:commandButton id="btnAsociarFacturas" process="@this"
+										 update="formPrincipal formPrincipalAsc "
+										 title="Asociar compras a formulario" style="float:center;"
+										 ajax="true" value="Selección Compras"
+										 styleClass="btn-sm btn-primary"
+										 oncomplete="PF('dlgAscCompras').show();" icon="fa fa-check"
+										 actionListener="#{formulario120Controller.filtrarComprasPosibles()}">
+						</p:commandButton>
+						<p:commandButton id="btnDesasociarFacturastodas"
+										 value="Desmarcar Todas"
+										 actionListener="#{formulario120Controller.desmarcarTodasLasCompras()}"
+										 process="@this" update="formPrincipal"
+										 title="Desmarcar Todas las Facturas" style="float:center;"
+										 ajax="true" styleClass="btn-sm btn-warning" icon="fa fa-undo">
+							<p:confirm header="Confirmar"
+									   message="¿Está seguro que desea desmarcar todas las facturas contenidas en el presente formulario?"
+									   icon="ui-icon-alert" />
+						</p:commandButton>
+
+					</p:panelGrid>
+					<p:spacer></p:spacer>
+					<p:dataTable var="factura"
+								 value="#{formulario120Controller.vListaAsociadas}"
+								 id="tblFacturas"
+								 emptyMessage="No se encontraron facturas para el formulario seleccionado"
+								 styleClass="table table-striped table-bordered table-hover table-sm"
+								 widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="10"
+								 paginator="true" sortMode="multiple" paginatorPosition="bottom"
+								 rowsPerPageTemplate="5,10,20" paginatorAlwaysVisible="false"
+								 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								 currentPageReportTemplate="{totalRecords} registros"
+								 toggleable="true" editable="false">
+						<p:column headerText="N°" styleClass="ui-icon-table">
+							<p:outputLabel value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column headerText="NIT Proveedor" style="text-align:center"
+								  sortBy="#{factura.nitProveedor}">
+							<h:outputText value="#{factura.nitProveedor}" style="float:right" />
+						</p:column>
+						<p:column headerText="Razón Social" style="text-align:center">
+							<h:outputText value="#{factura.razonSocialProveedor}" style="float:left"/>
+						</p:column>
+						<p:column headerText="N° Factura" style="text-align:center">
+							<h:outputText value="#{factura.numeroFactura}"
+										  style="float:right" />
+						</p:column>
+						<p:column headerText="N° Autorización/CUF"
+								  style="text-align:center">
+							<h:outputText value="#{factura.codigoAutorizacion}"
+										  style="float:right" />
+						</p:column>
+						<p:column sortBy="#{factura.fechaFactura}"
+								  headerText="Fecha Emisión" style="text-align:center">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{factura.fechaFactura}">
+										<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+									<p:inputMask id="txtFechaEmision" required="true"
+												 value="#{factura.fechaFactura}" mask="99/99/9999"
+												 requiredMessage="Fecha emision dato requerido"
+												 styleClass="ui-fluid" converterMessage="Formato incorrecto">
+										<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+										<p:message id="mfecha" for="txtFechaEmision"></p:message>
+									</p:inputMask>
+									<p:watermark value="dd/MM/yyyy" for="txtFechaEmision" />
+
+								</f:facet>
+							</p:cellEditor>
+
+						</p:column>
+						<p:column headerText="Importe Total"
+								  sortBy="#{factura.importeTotalCompra}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText style="float:right"
+												  value="#{factura.marcaEspecialId=='7RG'?factura.importeTotalCompra: factura.importeBaseCf}">
+										<f:convertNumber locale="en-US" pattern="#,##0.00" />
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+
+									<p:inputNumber id="txtMontoTotal" maxValue="999999999999999.99"
+												   decimalPlaces="2" thousandSeparator="," decimalSeparator="."
+												   minValue="0.00" value="#{factura.importeTotalCompra}">
+										<p:message id="mImporteTotal" for="txtMontoTotal">
+										</p:message>
+
+									</p:inputNumber>
+									<p:keyFilter for="txtMontoTotal" regEx="/[\d]/" />
+
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Cod. Control">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{factura.codigoControl}">
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input" >
+									<p:inputMask id="txtCodControl"
+												 value="#{factura.codigoControl}" mask="**-**-**-**?-**"
+												 readonly="#{factura.modalidadId=='MAN' or
+									factura.modalidadId=='FCL' or factura.modalidadId=='FPW' or factura.modalidadId=='FEL'
+									or factura.modalidadId=='FEL' or factura.modalidadId=='PRE'}">
+									</p:inputMask>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Desmarcar" style="text-align: center"
+								  rendered="#{formulario120Controller.formulario.estadoFormularioId !='DEC' and formulario120Controller.formulario.estadoFormularioId !='ACP'}">
+							<p:commandLink
+									action="#{formulario120Controller.desmarcarCompra(factura)}"
+									process="@this" update="formPrincipal">
+								<span class="fa fa-undo" title="Desmarcar Factura"></span>
+							</p:commandLink>
+							<p:confirmDialog global="true" showEffect="fade"
+											 responsive="true" position="center center">
+								<p:commandButton value="Si"
+												 styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+												 icon="fa fa-check" />
+								<p:commandButton value="No"
+												 styleClass="ui-confirmdialog-no btn-warning btn-sm"
+												 icon="fa fa-close" />
+							</p:confirmDialog>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+
+				<p:panel id="pnDetTotales" header="Detalles de Totales"
+						 styleClass="ui-fluid">
+					<p:panelGrid columns="4"
+								 columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4"
+								 layout="grid" styleClass="ui-panelgrid-blank">
+						<p:outputLabel value="Total Promedio Ingresos" style="float:center" />
+							<p:outputLabel value="Cantidad Facturas" style="float:center" />
+						<p:outputLabel value="Total Importe Facturas" style="text-align:center" />
+						<p:outputLabel value="Reintegro IVA"/>
+
+						<p:inputText id="totalIngresos"
+									 value="#{formulario120Controller.beneficiario.totalSalario}"
+									 readonly="true" style="text-align: right" />
+
+						<p:inputText id="CantidadOtras"
+									 value="#{formulario120Controller.cantidadComprasOtras}"
+									 readonly="true" style="text-align: right" />
+
+						<p:inputText id="SumaTotalOtras"
+									 value="#{formulario120Controller.vSumaTotalMontosOtras}"
+									 readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+
+						<p:inputText value="#{formulario120Controller.reIntegroIva}"
+									 readonly="true" style="text-align: right">
+							<f:convertNumber locale="en-US" maxFractionDigits="2" />
+						</p:inputText>
+					</p:panelGrid>
+
+					<p:spacer />
+
+					<p:panelGrid columns="6"
+								 columnClasses="ui-grid-col-8,ui-grid-col-2, ui-grid-col-2"
+								 layout="grid" styleClass="ui-panelgrid-blank box-primary">
+						<p:spacer />
+						<p:spacer />
+						<p:spacer />
+
+
+						<p:commandButton id="btnGuardar" value="Guardar Cambios"
+										 styleClass="btn btn-sm btn-primary" update="formPrincipal"
+										 rendered="#{formulario120Controller.formulario.estadoFormularioId =='REG' and (
+										 formulario120Controller.vListaDesseleccionadosSinGuardar.size() > 0 or
+						formulario120Controller.vListaSeleccioandosSinGuardar.size() > 0)}"
+										 action="#{formulario120Controller.persistirCambios()}">
+						</p:commandButton>
+
+						<visor:visorPdf esVisibleBoton="#{!(formulario120Controller.cantidadComprasOtras==0)}"
+										nombreWidgetVar="idFormularioInscripcionDlg"
+										txtButtonAccion="Imprimir" icon="fa  fa-print"
+										styleClass="btn btn-success"
+										archivoB64="#{formulario120Controller.reportesController.respuestaBase64}"
+										txtTitulo="Formulario 111" id="btnVisorPdf"
+										rendered="#{formulario120Controller.formulario.estadoFormularioId!='REG' and
+							(formulario120Controller.vListaDesseleccionadosSinGuardar.size()==0 and
+							formulario120Controller.vListaSeleccioandosSinGuardar.size()==0)}">
+						</visor:visorPdf>
+						<p:panelGrid columns="1"  rendered="#{formulario120Controller.formulario.estadoFormularioId=='REG' and
+							(formulario120Controller.vListaDesseleccionadosSinGuardar.size()==0 and
+							formulario120Controller.vListaSeleccioandosSinGuardar.size()==0)}"
+
+									 layout="grid" styleClass="ui-panelgrid-blank">
+						<p:commandButton value="Realizar Declaración"
+										 disabled="#{(formulario120Controller.cantidadComprasOtras==0) or
+							(formulario120Controller.vListaDesseleccionadosSinGuardar.size()!=0 or
+							formulario120Controller.vListaSeleccioandosSinGuardar.size()!=0)}"
+										 style="float:right" styleClass="btn btn-warning btn-sm"
+										 update="formPrincipal"
+										 action="#{formulario120Controller.declarar()}"
+										 rendered="#{formulario120Controller.formulario.estadoFormularioId=='REG' and
+							(formulario120Controller.vListaDesseleccionadosSinGuardar.size()==0 and
+							formulario120Controller.vListaSeleccioandosSinGuardar.size()==0)}"
+						>
+							<p:confirm
+
+									header="¿ Esta Seguro de Enviar el Formulario ?"
+									message="Una Vez Confirmado No Podra Modificar Este Formulario"
+
+									    />
+						</p:commandButton>
+						<p:confirmDialog
+
+										  showEffect="fade" hideEffect="fade" >
+							<p:commandButton value="Aceptar"   styleClass="btn btn-primary btn-sm ui-confirmdialog-yes" icon="fa fa-save" />
+							<p:commandButton value="Cancelar" ajax="false"  styleClass="btn-danger btn-sm ui-confirmdialog-no" icon="fa fa-remove" />
+						</p:confirmDialog>
+						</p:panelGrid>
+					</p:panelGrid>
+				</p:panel>
+
+
+			</p:panel>
+			<p:panel visible="false">
+				<visor:visorPdf esVisibleBoton="true"
+								nombreWidgetVar="idFormularioInscripcionDlg"
+								txtButtonAccion="Imprimir" icon="fa  fa-print"
+								styleClass="btn btn-danger pull-right"
+								archivoB64="#{formulario120Controller.reportesController.respuestaBase64}"
+								txtTitulo="Formulario 111" id="reportePdf">
+				</visor:visorPdf>
+			</p:panel>
+		</h:form>
+		<p:dialog id="dlgAgregaFormulario"
+				  header="Registro Nuevo Formulario 111" appendToBody="true"
+				  height="70%" width="40%" widgetVar="dlgAgregaFormulario" modal="true"
+				  scroll="true" showEffect="size" hideEffect="fade" resizable="false"
+				  dynamic="true">
+			<h:form id="cformularioNuevo">
+
+				<p:panel id="pnlNuevForm" styleClass="box-primary ui-fluid"
+						 toggleable="true">
+				<p:panelGrid id="pnGAgente" columns="2"
+									 columnClasses="ui-grid-col-6,ui-grid-col-6"
+									 layout="grid" styleClass="ui-panelgrid-blank">
+
+							<p:row>
+								<p:outputLabel class="control-label" value="Gestión: " />
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+							</p:row>
+
+							<p:row>
+								<p:selectOneMenu id="gestion"
+												 value="#{formulario120Controller.formularioNuevo.anioPeriodo}"
+												 required="true" requiredMessage="Dato Requerido">
+									<p:ajax event="change" listener="#{formulario120Controller.updateCalendar}" update="txtFechaPresentacion" />
+									<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+												  noSelectionOption="true" />
+									<f:selectItems
+											value="#{of:createIntegerArray(of:formatDate(now,'yyyy'),of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+									<p:clientValidator event="change" />
+								</p:selectOneMenu>
+								<p:message for="gestion" />
+							</p:row>
+							<p:row>
+								<p:outputLabel class="control-label" value="Periodo: " />
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+							</p:row>
+
+							<p:row>
+								<p:selectOneMenu id="mes"
+												 value="#{formulario120Controller.formularioNuevo.mesPeriodo}"
+												 required="true" requiredMessage="Dato Requerido"
+								                >
+									<p:ajax event="change" listener="#{formulario120Controller.updateCalendar}" update="txtFechaPresentacion" />
+									<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+												  noSelectionOption="true" />
+
+									<f:selectItem itemValue="1" itemLabel="ENERO" />
+									<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+									<f:selectItem itemValue="3" itemLabel="MARZO" />
+									<f:selectItem itemValue="4" itemLabel="ABRIL" />
+									<f:selectItem itemValue="5" itemLabel="MAYO" />
+									<f:selectItem itemValue="6" itemLabel="JUNIO" />
+									<f:selectItem itemValue="7" itemLabel="JULIO" />
+									<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+									<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+									<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+									<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+									<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+									<p:clientValidator event="change" />
+
+								</p:selectOneMenu>
+								<p:message for="mes" />
+							</p:row>
+							<p:row>
+								<p:outputLabel class="control-label" value="Lugar de Presentación: " />
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+							</p:row>
+
+							<p:row>
+								<p:selectOneMenu id="lugarPresentacion"
+												 value="#{formulario120Controller.formularioNuevo.lugarDepartamento}"
+												 required="true" requiredMessage="Dato Requerido">
+									<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+												  noSelectionOption="true" />
+									<f:selectItems
+											value="#{formulario120Controller.listaDepartamentos}"
+											var="depto" itemLabel="#{depto.nombre}"
+											itemValue="#{depto.departamentoId}" />
+									<p:clientValidator event="change" />
+
+								</p:selectOneMenu>
+								<p:message for="lugarPresentacion" />
+							</p:row>
+							<p:row>
+								<p:outputLabel value="Fecha de Presentación: " />
+								<p:outputLabel style="color:dodgerblue;">*</p:outputLabel>
+
+							</p:row>
+
+							<p:row>
+
+								<p:calendar  id="txtFechaPresentacion" required="true"
+											 requiredMessage="Dato Requerido"
+											 pattern="dd/MM/yyyy"
+											 mindate="#{formulario120Controller.minFechaPresentacion}"
+											 maxdate="#{formulario120Controller.maxFechaPresentacion}"
+											 readonlyInput="true"
+											 value="#{formulario120Controller.formularioNuevo.fechaPresentacion}"
+											 mask="99/99/9999" converterMessage="Formato incorrecto"
+								             >
+									<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+									<p:clientValidator event="change" />
+									<p:clientValidator event="blur" />
+
+								</p:calendar>
+
+								<p:message for="txtFechaPresentacion" />
+
+
+
+							</p:row>
+
+
+
+						</p:panelGrid>
+
+
+					<p:spacer/>
+
+					<p:panelGrid id="panelBotonesForm" columns="3"
+								 columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4"
+								 layout="grid" styleClass="ui-panelgrid-blank">
+						<p:row>
+							<p:outputLabel style="color:dodgerblue;">Los campos marcados con (*) son obligatorios</p:outputLabel>
+						</p:row>
+						<p:commandButton id="btnAdicionarFormulario"
+										 value="Guardar" style="float:right"
+										 styleClass="btn btn-primary btn-sm" validateClient="true"
+										 process="@form @this" icon="fa fa-save"
+										 update="@([id$=pnlDetalleFormulario]) cformularioNuevo @([id$=formPrincipal])"
+										 actionListener="#{formulario120Controller.adicionarFormulario()}">
+						</p:commandButton>
+						<p:commandButton id="cerrar2" value="Cancelar" immediate="true"
+										 icon="fa fa-remove" validateClient="false"
+										 styleClass="ui-confirmdialog-yes btn btn-danger btn-sm"
+										 actionListener="#{formulario120Controller.nuevoFormulario()}"
+										 onclick="PF('dlgAgregaFormulario').hide();"
+										 update="dlgAgregaFormulario">
+						</p:commandButton>
+					</p:panelGrid>
+				</p:panel>
+
+			</h:form>
+
+		</p:dialog>
+
+		<p:dialog id="dlgAscCompras" header="Selección de Compras"
+				  widgetVar="dlgAscCompras" modal="true" scroll="true"
+				  position="center center" showEffect="fade" hideEffect="fade"
+				  resizable="false" dynamic="true" height="50%" width="90%">
+			<h:form id="formPrincipalAsc">
+				<sre:ComponenteAsociacionCompras id="asocCompras"
+												 facturaAscSelect="#{formulario120Controller.facturasAscSelect}"
+												 listaComprasLazy="#{formulario120Controller.vListaSeleccionables}"
+												 asociarAction="#{formulario120Controller.adicionarSeleccionados()}"></sre:ComponenteAsociacionCompras>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgConfirmFecha" header="Confirmarción"
+				  appendToBody="true" height="30%" width="50%"
+				  widgetVar="dlgConfirmFecha" modal="true" scroll="true"
+				  showEffect="size" hideEffect="fade" resizable="false" dynamic="true">
+			<h:form id="formConfirmacion">
+				<p:outputLabel>¿Está seguro de cambiar la fecha de presentación?. Las facturas que queden fuera del rango admitido serán desmarcadas. </p:outputLabel>
+				<!-- 				 ="#{formulario120Controller.cambiarFechaPresentacionFormulario()}" update="formPrincipal"-->
+				<p:panelGrid id="panelBotones" columns="4"
+							 columnClasses="ui-grid-col-8,ui-grid-col-1,ui-grid-col-1,ui-grid-col-1"
+							 layout="grid" styleClass="ui-panelgrid-blank">
+					<p:spacer />
+
+					<p:commandButton value="Si" icon="fa fa-check"
+									 styleClass="btn btn-primary btn-sm" process="@this"
+									 actionListener="#{formulario120Controller.cambiarFechaPresentacionFormulario()}"
+									 oncomplete="PF('dlgConfirmFecha').hide();" update="formPrincipal" />
+					<p:spacer />
+					<p:commandButton value="No" icon="fa fa-close"
+									 actionListener="#{formulario120Controller.retornaValores()}"
+									 styleClass="btn btn-warning btn-sm"
+									 oncomplete="PF('dlgConfirmFecha').hide();" update="formPrincipal" />
+				</p:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>

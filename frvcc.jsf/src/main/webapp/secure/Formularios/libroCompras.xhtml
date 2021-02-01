@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateAuth.xhtml"
+	xmlns:compac="http://java.sun.com/jsf/composite/modalidadfac"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor">
+
+	<style type="text/css">
+.column {
+	font-weight: bold;
+}
+</style>
+
+	<f:metadata>
+		<f:viewAction action="#{logedBean.check}" />
+	</f:metadata>
+
+	<ui:define name="title">
+       LIBRO DE COMPRAS
+    </ui:define>
+
+
+	<ui:define name="body">
+		<f:event type="preRenderView"
+			listener="#{menuLateralBean.actualizaMenuLateral()}" />
+			
+			
+		<script type="text/javascript">
+		function controlClick(id) {
+		$("button[id$='"+id+"']").click();
+		} 
+	 </script>
+		<script type="text/javascript">
+		function abrirVisorReporte() {
+			if (document.getElementById('formPrincipal:btnVisorPdf:btnVisorPdf') != undefined) {
+			document.getElementById('formPrincipal:btnVisorPdf:btnVisorPdf').click();
+			}				
+		}	
+		</script>
+
+		<h:form id="formPrincipal">
+			<p:panel id="pnlLibros" styleClass="box-primary ui-fluid">
+				<p:panelGrid columns="5"
+					columnClasses="ui-grid-col-1,ui-grid-col-3,ui-grid-col-1, ui-grid-col-3,ui-grid-col-2"
+					layout="grid" styleClass="ui-panelgrid-blank">
+					<!-- 														<p:spacer/> -->
+					<p:outputLabel value="Gestión: " />
+					<p:selectOneMenu
+						value="#{libroComprasVentasController.anioPeriodo}" id="cbAnio">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar"
+							noSelectionOption="true" />
+						<f:selectItems
+							value="#{of:createIntegerArray(of:formatDate(now,'yyyy'),of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2020))}" />
+						<p:ajax event="change" update="formPrincipal"
+							listener="#{libroComprasVentasController.cargarLibrosPeriodoActual()}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Periodo: " rendered="#{libroComprasVentasController.esNewton}"/>
+					<p:selectOneMenu value="#{libroComprasVentasController.mesPeriodo}"
+						id="cbMes"
+						rendered="#{libroComprasVentasController.esNewton}">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+						<f:selectItem itemValue="1" itemLabel="ENERO" />
+						<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+						<f:selectItem itemValue="3" itemLabel="MARZO" />
+						<f:selectItem itemValue="4" itemLabel="ABRIL" />
+						<f:selectItem itemValue="5" itemLabel="MAYO" />
+						<f:selectItem itemValue="6" itemLabel="JUNIO" />
+						<f:selectItem itemValue="7" itemLabel="JULIO" />
+						<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+						<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+						<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+						<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+						<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+						<f:selectItem itemValue="13" itemLabel="TODOS" />
+						<p:ajax event="change" update="formPrincipal"
+							listener="#{libroComprasVentasController.cargarLibrosPeriodoActual()}" />
+					</p:selectOneMenu>
+					<p:commandButton id="btnAgregarLibro" value="Nuevo Libro"
+						styleClass="btn  btn-success" style="float:center; width:100%;"
+						process="@this"
+						action="#{libroComprasVentasController.adicionarLibro()}"
+						update="pnlLibros" icon="fa fa-plus">
+					</p:commandButton>
+					<p:spacer />
+					<p:spacer />
+				</p:panelGrid>
+				<p:panel
+					rendered="#{!(libroComprasVentasController.vListaLibros.size()>0)}">
+					<p:outputLabel
+						value="No se encontraron libros registrados para el periodo y año especificados." />
+				</p:panel>
+				<p:panel header="Libros Registrados" id="pnlFormReg"
+					rendered="#{(libroComprasVentasController.vListaLibros.size()>0)}"
+					toggleable="true">
+					<p:panelGrid id="formulariosPeriodo" columns="4"
+						columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3, ui-grid-col-3"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<c:forEach items="#{libroComprasVentasController.vListaLibros}"
+							var="libro">
+							<p:commandLink process="@this"
+								actionListener="#{libroComprasVentasController.cargarDetallerLibro(libro)}"
+								update="pnlDetalleLibro formPrincipal"
+								title="Ver Detalle: #{libro.nombreLibro}">
+								<div
+									class="info-box bg-#{(libro.estadoLibroId == 'REG') ? 'olive' :(libro.estadoLibroId == 'DEC') ? 'teal':(libro.estadoLibroId == 'ACP') ? 'green':'red'}">
+									<span class="info-box-icon"><i class="fa fa-paperclip"></i></span>
+									<div class="info-box-content">
+										<span class="info-box-text"> #{libro.nombreLibro}</span> <span
+											class="info-box-number">Total Bs: <p:outputLabel
+												value="#{libro.totalCompras}">
+												<f:convertNumber pattern="#0.00" />
+											</p:outputLabel>
+
+										</span>
+<!-- 										<div class="progress"> -->
+<!-- 											<div class="progress-bar" style="width: 100%"></div> -->
+<!-- 										</div> -->
+										<span class="progress-description">
+											#{clasificadorController.descripcionEstadoLibrobyCodigo(libro.estadoLibroId)}
+										</span>
+
+									</div>
+								</div>
+							</p:commandLink>
+						</c:forEach>
+
+					</p:panelGrid>
+				</p:panel>
+
+			</p:panel>
+
+			<p:panel id="pnlDetalleLibro"
+				header="#{libroComprasVentasController.libroSeleccionado.nombreLibro}"
+				rendered="#{libroComprasVentasController.verDetalle}"
+				styleClass="box-primary ui-fluid" toggleable="true">
+				<p:panel header="Detalle Libro">
+					<p:panelGrid columns="4"
+						columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2, ui-grid-col-4"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:outputLabel value="NIT:" />
+						<p:outputLabel
+							value="#{libroComprasVentasController.libroSeleccionado.nit}" />
+						<p:outputLabel value="Razón Social:" />
+						<p:outputLabel
+							value="#{libroComprasVentasController.libroSeleccionado.razonSocial}" />
+
+						<p:outputLabel value="Gestión:" />
+						<p:outputLabel
+							value="#{libroComprasVentasController.libroSeleccionado.anioPeriodo}">
+						</p:outputLabel>
+						<p:outputLabel value="Periodo:" />
+						<p:outputLabel
+							value="#{libroComprasVentasController.obtenerDescripcionByNroMes(libroComprasVentasController.libroSeleccionado.mesPeriodo)}">
+						</p:outputLabel>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel header="Detalle Facturas" toggleable="true">
+					<p:tabView id="tabNotasFacturas" dynamic="true" cache="true"
+						binding="#{tabView}">
+						<!-- 							activeIndex="#{tabAutogestionDespacho.activeTabIndex} -->
+						<!-- 							<p:ajax event="tabChange" -->
+						<!-- 								listener="#{tabAutogestionDespacho.onTabChanged}" update="op0,op1,op2"/> -->
+						<p:tab title="ESTANDAR" id="tab0">
+							<p:outputPanel id="op0">
+								<p:panel>
+									<p:panelGrid id="pnlgDesAsociarTodas" columns="3"
+										rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId =='REG'}"
+										columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+										layout="grid" styleClass="ui-panelgrid-blank">
+										<p:spacer />
+										<p:commandButton id="btnAsociarFacturas" process="@this"
+											update="formPrincipal formPrincipalAsc"
+											title="Asociar compras a formulario" style="float:center;"
+											ajax="true" value="Selección Compras"
+											styleClass="btn-sm btn-primary"
+											oncomplete="PF('dlgAscCompras').show();" icon="fa fa-check"
+											actionListener="#{libroComprasVentasController.cargarListaComprasRegistradas()}">
+										</p:commandButton>
+										<p:commandButton id="btnDesasociarFacturastodas"
+											value="Desmarcar Todas"
+											actionListener="#{libroComprasVentasController.devolverFacturasTodas()}"
+											process="@this" update="formPrincipal"
+											title="Desmarcar Todas las Facturas" style="float:center;"
+											ajax="true" styleClass="btn-sm btn-warning" icon="fa fa-undo">
+											<p:confirm header="Confirmar"
+												message="¿Está seguro que desea desmarcar todas las facturas contenidas en el presente libro?"
+												icon="ui-icon-alert" />
+										</p:commandButton>
+
+									</p:panelGrid>
+									<p:dataTable var="factura"
+										value="#{libroComprasVentasController.vListaAsociadas}"
+										id="tblFacturas"
+										emptyMessage="No se encontraron facturas para el libro seleccionado"
+										styleClass="table table-striped table-bordered table-hover table-sm"
+										widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="5"
+										paginator="true" sortMode="multiple"
+										paginatorPosition="bottom" rowsPerPageTemplate="5,10,20"
+										paginatorAlwaysVisible="false"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										currentPageReportTemplate="{totalRecords} registros"
+										toggleable="true" editable="false">
+										<p:column headerText="N°" styleClass="ui-icon-table">
+											<p:outputLabel value="#{rowIndex+1}" />
+										</p:column>
+										<p:column headerText="Fecha Factura o DUI"
+											style="text-align:center">
+											<h:outputText value="#{factura.fechaFactura}">
+												<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="NIT Proveedor" style="text-align:center">
+											<h:outputText value="#{factura.nitProveedor}" />
+										</p:column>
+										<p:column headerText="Razon Social" style="text-align:center">
+											<h:outputText value="#{factura.razonSocialProveedor}" />
+										</p:column>
+										<p:column headerText="N° Factura" style="text-align:center">
+											<h:outputText value="#{factura.numeroFactura}" />
+										</p:column>
+										<p:column headerText="N° DUI" style="text-align:center">
+											<h:outputText value="#{factura.numeroDui}" />
+										</p:column>
+										<p:column headerText="N° Autorizacion"
+											style="text-align:center">
+											<h:outputText value="#{factura.codigoAutorizacion}" />
+										</p:column>
+										<p:column headerText="Importe Total de la Compra">
+											<h:outputText style="float:right"
+												value="#{factura.importeTotalCompra}">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+											<f:facet id="footer" name="footer">
+												<h:outputText id="lblSumaImportesTotales"
+													value="#{libroComprasVentasController.vSumaTotalImportesTotales}"
+													style="font-weight: bold;">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+										<p:column headerText="Importe no sujeto a Crédito fiscal">
+											<h:outputText style="float:right"
+												value="#{factura.importeNoSujetoCf}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+											<f:facet id="footer" name="footer">
+												<h:outputText id="lblSumaImportesNSCF"
+													value="#{libroComprasVentasController.vSumaTotalImportesNSCF}"
+													style="font-weight: bold;">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+										<p:column headerText="Subtotal">
+											<h:outputText style="float:right" value="#{factura.subtotal}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+											<f:facet id="footer" name="footer">
+												<h:outputText id="lblSumaSubTotales"
+													value="#{libroComprasVentasController.vSumaTotalSubTotales}"
+													style="font-weight: bold;">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+										<p:column
+											headerText="Descuentos, Bonificaciones y rebajas sujetas al IVA">
+											<h:outputText style="float:right"
+												value="#{factura.descuento}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+											<f:facet id="footer" name="footer">
+												<h:outputText id="lblSumaDescuentos"
+													value="#{libroComprasVentasController.vSumaTotalDesceuntos}"
+													style="font-weight: bold;">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+										<p:column headerText="Importe Base para Crédito Fiscal">
+											<h:outputText style="float:right"
+												value="#{factura.importeBaseCf}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+											<f:facet id="footer" name="footer">
+												<h:outputText id="lblSumaImporteBCF"
+													value="#{libroComprasVentasController.vSumaTotalImportesBCF}"
+													style="font-weight: bold;">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+										<p:column headerText="Crédito Fiscal">
+											<h:outputText style="float:right"
+												value="#{factura.creditoFiscal}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+											<f:facet id="footer" name="footer">
+												<h:outputText id="lblSumaCredFiscal"
+													value="#{libroComprasVentasController.vSumaTotalCF}"
+													style="font-weight: bold;">
+													<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+										<p:column headerText="Cod. Control" style="text-align:center">
+											<h:outputText value="#{factura.codigoControl}">
+											</h:outputText>
+										</p:column>
+										<!-- 										<p:column headerText="Factura Electrónica" -->
+										<!-- 											style="text-align:center"> -->
+										<!-- 											<h:outputText value="E" rendered="#{factura.ventaId!=null}"> -->
+										<!-- 											</h:outputText> -->
+										<!-- 										</p:column> -->
+										<p:column headerText="Tipo de Compra"
+											style="text-align:center">
+											<h:outputText
+												value="#{clasificadorController.descripcionTipoCompraByCodigo(factura.tipoCompraId)}" />
+										</p:column>
+										<p:column headerText="Tipo de Factura"
+											style="text-align:center" sortBy="#{factura.marcaEspecialId}">
+											<h:outputText value="#{factura.modalidadId=='LIN'?'LIN ':''}" />
+											<h:outputText
+												value="#{factura.modalidadId=='ELE' or factura.modalidadId=='CIC'?'E ':''}" />
+											<h:outputText
+												value="#{factura.marcaEspecialId=='IPN' ?'PROD-NAL ':''}" />
+											<h:outputText
+												value="#{factura.marcaEspecialId=='7RG' ?'7RG ':''}" />
+										</p:column>
+										<p:column headerText="Desmarcar Factura"
+											style="text-align: center"
+											rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId !='DEC'}">
+											<p:commandLink
+												action="#{libroComprasVentasController.devolverFactura(factura)}"
+												process="@this" update="formPrincipal">
+												<span class="fa fa-undo" title="Devolver Factura"></span>
+												<p:confirm header="Confirmar"
+													message="¿Está seguro que desea devolver la factura seleccionada?"
+													icon="ui-icon-alert" />
+											</p:commandLink>
+											
+										</p:column>
+									</p:dataTable>
+								</p:panel>
+								<p:panel header="Detalles Totales">
+									<p:dataTable var="vTotal"
+										value="#{libroComprasVentasController.vListTotales}"
+										id="tblTotalesEstandar" emptyMessage="No hay totales"
+										styleClass="table table-striped table-bordered table-hover table-sm"
+										widgetVar="tblTotalesEstandar" rowIndexVar="rowIndex"
+										rows="10" paginator="true" sortMode="multiple"
+										paginatorPosition="bottom" rowsPerPageTemplate="5,10,20"
+										paginatorAlwaysVisible="false"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										currentPageReportTemplate="{totalRecords} registros"
+										toggleable="true" editable="false">
+										<p:column headerText="TIPO COMPRA" style="text-align:center">
+											<h:outputText value="#{vTotal.descripcionTipoCompra}" />
+										</p:column>
+										<p:column headerText="IMPORTE TOTAL DE LA COMPRA">
+											<h:outputText style="float:right"
+												value="#{vTotal.totalCompras}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="IMPORTE NO SUJETO A CREDITO FISCAL">
+											<h:outputText style="float:right"
+												value="#{vTotal.importeNoSujetoCf}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="SUBTOTAL">
+											<h:outputText style="float:right"
+												value="#{vTotal.importeNoSujetoCf}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column
+											headerText="DESCUENTOS, BONIFICACIONES Y REBAJAS OBTENIDAS">
+											<h:outputText style="float:right"
+												value="#{vTotal.descuentos}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="IMPORTE BASE PARA CREDITO FISCAL">
+											<h:outputText style="float:right"
+												value="#{vTotal.importeBaseCf}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="CREDITO FISCAL">
+											<h:outputText style="float:right"
+												value="#{vTotal.creditoFiscal}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+
+									</p:dataTable>
+								</p:panel>
+							</p:outputPanel>
+						</p:tab>
+						<p:tab title="NOTAS DE CRÉDITO Y DEBITO" id="tab1">
+							<p:outputPanel id="op1">
+								<p:panel>
+									<p:panelGrid id="pnlgAsocNotas" columns="3"
+										rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId =='REG'}"
+										columnClasses="ui-grid-col-8,ui-grid-col-2,ui-grid-col-2"
+										layout="grid" styleClass="ui-panelgrid-blank">
+										<p:spacer />
+										<p:commandButton id="btnAsociarNotas" process="@this"
+											update="formPrincipal formPrincipalAscNotas"
+											title="Adicionar Notas al libro" style="float:center;"
+											ajax="true" value="Selección Notas"
+											styleClass="btn-sm btn-primary"
+											oncomplete="PF('dlgAscNotas').show();" icon="fa fa-check"
+											actionListener="#{libroComprasVentasController.cargarListaComprasNotasRegistradas()}">
+										</p:commandButton>
+										<p:commandButton id="btnDesasociarNotas"
+											value="Desmarcar Todas"
+											actionListener="#{libroComprasVentasController.devolverNotasTodas()}"
+											process="@this" update="formPrincipal"
+											title="Desmarcar Todas las Notas" style="float:center;"
+											ajax="true" styleClass="btn-sm btn-warning" icon="fa fa-undo">
+											<p:confirm header="Confirmar"
+												message="¿Está seguro que desea desmarcar todas las notas contenidas en el presente libro"
+												icon="ui-icon-alert" />
+										</p:commandButton>
+
+									</p:panelGrid>
+									<p:dataTable var="factura"
+										value="#{libroComprasVentasController.vListaNotasAsociadas}"
+										id="tblNotas"
+										emptyMessage="No se encontraron facturas para el libro seleccionado"
+										styleClass="table table-striped table-bordered table-hover table-sm"
+										widgetVar="tblFacturas" rowIndexVar="rowIndex" rows="10"
+										paginator="true" sortMode="multiple"
+										paginatorPosition="bottom" rowsPerPageTemplate="5,10,20"
+										paginatorAlwaysVisible="false"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										currentPageReportTemplate="{totalRecords} registros"
+										toggleable="true" editable="false">
+										<p:column headerText="N°" styleClass="ui-icon-table">
+											<p:outputLabel value="#{rowIndex+1}" />
+										</p:column>
+										<p:column headerText="Fecha Nota Credito - Debito"
+											style="text-align:center">
+											<h:outputText value="#{factura.fechaNota}">
+												<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="N° Nota Crédito - Debito"
+											style="text-align:center">
+											<h:outputText value="#{factura.numeroNota}" />
+										</p:column>
+										<p:column headerText="N° Autorizacion"
+											style="text-align:center">
+											<h:outputText value="#{factura.codigoAutorizacion}" />
+										</p:column>
+
+										<p:column headerText="Estado" style="text-align:center">
+											<h:outputText value="#{factura.estadoNotaId}" />
+										</p:column>
+										<p:column headerText="NIT/CI Cliente"
+											style="text-align:center">
+											<h:outputText value="#{factura.numeroDocumentoCliente}" />
+										</p:column>
+										<p:column headerText="Nombre/Razon Social Cliente"
+											style="text-align:center">
+											<h:outputText value="#{factura.nombreCliente}" />
+										</p:column>
+
+										<p:column
+											headerText="Importe Total de la Devolucion o Recision Recibida">
+											<h:outputText style="float:right"
+												value="#{factura.importeTotalNota}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="Crédito fiscal">
+											<h:outputText style="float:right"
+												value="#{factura.creditoFiscalNota}">
+												<f:convertNumber locale="en-US"  pattern="#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column
+											headerText="Cod. Control de la Nota de Credito - Debito"
+											style="text-align:center">
+											<h:outputText value="#{factura.codigoControlNota}">
+											</h:outputText>
+										</p:column>
+										<p:column headerText="Fecha Factura Original"
+											style="text-align:center">
+											<h:outputText value="#{factura.fechaFacturaOriginal}">
+												<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="Número Factura Original"
+											style="text-align:center">
+											<h:outputText value="#{factura.numeroFacturaOriginal}" />
+										</p:column>
+										<p:column headerText="N° Autorizacion Factura Original"
+											style="text-align:center">
+											<h:outputText value="#{factura.codigoAutorizacionOriginal}" />
+										</p:column>
+										<p:column headerText="Importe Total Factura Original"
+											style="text-align:center">
+											<h:outputText value="#{factura.importeTotalOriginal}" />
+										</p:column>
+										<p:column headerText="Desmarcar Nota"
+											style="text-align: center"
+											rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId !='REC'}">
+											<p:commandLink
+												action="#{libroComprasVentasController.devolverNota(factura)}"
+												process="@this" update="formPrincipal">
+												<span class="fa fa-undo" title="Desmarcar Nota"></span>
+												<p:confirm header="Confirmar"
+													message="¿Está seguro que desea devolver la factura seleccionada?"
+													icon="ui-icon-alert" />
+											</p:commandLink>
+											<p:confirmDialog global="true" showEffect="fade"
+												responsive="true" position="center center">
+												<p:commandButton value="Si"
+													styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+													icon="fa fa-check" />
+												<p:commandButton value="No"
+													styleClass="ui-confirmdialog-no btn-warningbtn-sm"
+													icon="fa fa-close" />
+											</p:confirmDialog>
+										</p:column>
+									</p:dataTable>
+								</p:panel>
+								<p:panel header="Detalles Totales">
+									<p:panelGrid columns="4"
+										columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-2, ui-grid-col-2"
+										layout="grid" styleClass="ui-panelgrid-blank">
+										<p:outputLabel value="ESTADO" />
+										<p:outputLabel
+											value="IMPORTE TOTAL DE LA DEVOLUCION O RECISION RECIBIDA" />
+										<p:outputLabel value="CRÉDITO FISCAL" />
+										<p:outputLabel value="IMPORTE TOTAL FACTURA ORIGINAL" />
+										<!--linea -->
+										<p:outputLabel value="VALIDA" />
+										<p:inputText/>
+										<p:inputText/>
+										<p:inputText/>
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.totalComprasIAG}"> -->
+<!-- 											<f:convertNumber locale="en-US"  pattern="#,##0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.importeNoSujetoCfIAG}"> -->
+<!-- 											<f:convertNumber locale="en-US"  pattern="#,##0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.subtotalIAG}"> -->
+<!-- 											<f:convertNumber locale="en-US"  pattern="#,##0.00" /> -->
+<!-- 										</p:inputText> -->
+										<!--linea -->
+										<p:outputLabel value="ANULADA" />
+											<p:inputText/>
+										<p:inputText/>
+										<p:inputText/>
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.totalComprasIANG}"> -->
+<!-- 											<f:convertNumber locale="en-US"  pattern="#,##0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.importeNoSujetoCfIANG}"> -->
+<!-- 											<f:convertNumber locale="en-US"  pattern="#,##0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.subtotalIANG}"> -->
+<!-- 											<f:convertNumber locale="en-US"  pattern="#,##0.00" /> -->
+<!-- 										</p:inputText> -->
+										<!--linea -->
+										<p:outputLabel value="EXTRAVIADA" />
+											<p:inputText/>
+										<p:inputText/>
+										<p:inputText/>
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.totalComprasSP}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.importeNoSujetoCfSP}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.subtotalSP}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+										<!--linea -->
+										<p:outputLabel value="NO UTILIZADA" />
+											<p:inputText/>
+										<p:inputText/>
+										<p:inputText/>
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.totalComprasE}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.importeNoSujetoCfE}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.subtotalE}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+										<!--linea -->
+										<p:outputLabel value="EMITIDA POR CONTINGENCIA" />
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.totalComprasIE}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.importeNoSujetoCfIE}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.subtotalIE}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+											<p:inputText/>
+										<p:inputText/>
+										<p:inputText/>
+										<!--linea -->
+										<p:outputLabel value="TOTAL" />
+											<p:inputText/>
+										<p:inputText/>
+										<p:inputText/>
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.totalComprasIAG}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.importeNoSujetoCfIAG}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+<!-- 										<p:inputText -->
+<!-- 											value="#{libroComprasVentasController.totalesEstandar.subtotalIAG}"> -->
+<!-- 											<f:convertNumber pattern="#0.00" /> -->
+<!-- 										</p:inputText> -->
+
+									</p:panelGrid>
+								</p:panel>
+							</p:outputPanel>
+						</p:tab>
+						<p:confirmDialog global="true" showEffect="fade"
+												responsive="true" position="center center">
+												<p:commandButton value="Si"
+													styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+													icon="fa fa-check" />
+												<p:commandButton value="No"
+													styleClass="ui-confirmdialog-no btn-default btn-sm"
+													icon="fa fa-close" />
+											</p:confirmDialog>
+					</p:tabView>
+					<p:panelGrid columns="3"
+						columnClasses="ui-grid-col-8, ui-grid-col-2, ui-grid-col-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<p:spacer />
+						<p:selectOneButton
+							value="#{libroComprasVentasController.conMovimiento}"
+							rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId=='REG'}"
+							disabled="#{(libroComprasVentasController.vListaAsociadas.size()>0)}">
+							<f:selectItem itemLabel="Con Movimiento" itemValue="true" />
+							<f:selectItem itemLabel="Sin Movimiento" itemValue="false" />
+
+							<p:ajax event="change" update="btnDeclarar" />
+						</p:selectOneButton>
+						<p:commandButton value="Realizar Declaracion" id="btnDeclarar"
+							disabled="#{libroComprasVentasController.conMovimiento and !(libroComprasVentasController.vListaAsociadas.size()>0)}"
+							rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId=='REG'}"
+							style="float:right" update="formPrincipal"
+							styleClass="btn btn-success"
+							action="#{libroComprasVentasController.declarar}">
+							<p:confirm header="Confirmar"
+							message="¿Está seguro de realizar su declaración?. Si tiene compras realizadas a proveedores 
+							de modalidades que no son en linea, debe presentar su LCV Facilito en la misma fecha o  
+							su presentación se considerará como una rectificatoria."
+							icon="ui-icon-alert" />
+						</p:commandButton>
+						<visor:visorPdf esVisibleBoton="true"
+							nombreWidgetVar="idFormularioInscripcionDlg"
+							txtButtonAccion="Imprimir" icon="fa  fa-print"
+							styleClass="btn btn-danger btn-sm"  
+							archivoB64="#{libroComprasVentasController.reportesController.respuestaBase64}"
+							txtTitulo="Formulario 110" id="btnVisorPdf"
+							rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId!='REG'}">
+						</visor:visorPdf>
+							
+						<p:commandButton value="Rectificar" id="btnRectificar"
+							rendered="#{libroComprasVentasController.libroSeleccionado.estadoLibroId=='DEC'}"
+							style="float:right" update="formPrincipal" process="@this"
+							styleClass="btn btn-warning btn-sm"
+							action="#{libroComprasVentasController.habilitarRectificacion()}">
+						</p:commandButton>
+						<p:confirmDialog global="true" showEffect="fade"
+								responsive="true" position="center center">
+								<p:commandButton value="Si"
+									styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+									icon="fa fa-check" />
+								<p:commandButton value="No"
+									styleClass="ui-confirmdialog-no btn-warning btn-sm"
+									icon="fa fa-close" />
+							</p:confirmDialog>
+					</p:panelGrid>
+
+				</p:panel>
+
+			</p:panel>
+			
+			<p:panel
+				visible="false">
+				<visor:visorPdf esVisibleBoton="true"
+					nombreWidgetVar="idFormularioInscripcionDlg"
+					txtButtonAccion="Imprimir" icon="fa  fa-print"
+					styleClass="btn btn-danger pull-right"
+					archivoB64="#{libroComprasVentasController.reportesController.respuestaBase64}"
+					txtTitulo="Formulario 110" id="reportePdf">
+				</visor:visorPdf>
+			</p:panel>
+			
+		</h:form>
+		<p:dialog id="dlgAscCompras" header="Selección de Compras"
+			widgetVar="dlgAscCompras" modal="true" scroll="true"
+			position="center center" showEffect="fade" hideEffect="fade"
+			resizable="false" dynamic="true" appendToBody="true" height="50%"
+			width="90%">
+			<h:form id="formPrincipalAsc">
+				<sre:ComponenteAsociacionComprasLibro id="asocCompras"
+					facturaAscSelect="#{libroComprasVentasController.facturasAscSelect}"
+					listaComprasLazy="#{libroComprasVentasController.facturasComprasLazy}"
+					asociarAction="#{libroComprasVentasController.asociarfacturas()}"></sre:ComponenteAsociacionComprasLibro>
+			</h:form>
+		</p:dialog>
+		<p:dialog id="dlgAscNotas"
+			header="Selección de Notas de Crédito y Debito"
+			widgetVar="dlgAscNotas" modal="true" scroll="true"
+			position="center center" showEffect="fade" hideEffect="fade"
+			resizable="false" dynamic="true" appendToBody="true" height="50%"
+			width="90%">
+			<h:form id="formPrincipalAscNotas">
+				<sre:ComponenteAsociacionComprasNotasLibro id="asocComprasNotas"
+					facturaAscSelect="#{libroComprasVentasController.notasAscSelect}"
+					listaComprasLazy="#{libroComprasVentasController.facturasComprasNotasLazy}"
+					asociarAction="#{libroComprasVentasController.asociarNotas()}">
+				</sre:ComponenteAsociacionComprasNotasLibro>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

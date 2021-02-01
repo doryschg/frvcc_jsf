@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateNoAuth.xhtml"
+	xmlns:sre="http://java.sun.com/jsf/composite/componentsFrvcc"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+	<!-- 	<f:metadata> -->
+	<!-- 				<f:viewAction action="{logedBean.check}" /> -->
+	<!-- 	</f:metadata> -->
+
+	<ui:define name="title">REGISTRO DE VENTAS CONSOLIDADAS SIETE RG</ui:define>
+
+	<!-- CONTENT -->
+	<ui:define name="body">
+
+
+
+		<div class="ui-panel ui-widget ui-widget-content ui-corner-all">
+			<div class="ui-panel-content ui-widget-content">
+				<div
+					class="ui-panel ui-widget ui-widget-content ui-corner-all card box-primary ui-fluid">
+					<div
+						class="ui-panel-titlebar ui-widget-header ui-helper-clearfix ui-corner-all">
+						<span class="ui-panel-title">Registro de Ventas Consolidadas Siete RG</span>
+					</div>
+
+					<div class="ui-panel-content ui-widget-content">
+						<!-- 	CONTENT-PAGE	 -->
+						<div class="content">
+
+							<!-- 		SELECCION DE PERIODO Y GESTION 		-->
+							<h:form id="frmRegistro" class="form-horizontal">
+
+								<div class="form-group">
+									<h:outputLabel class="col-md-1 control-label ui-outputlabel"
+										value="Gestion:" />
+									<div class="col-md-3">
+										<p:selectOneMenu id="slctOnMenGestion" value="#" style="width: 100%">
+											<f:selectItem itemLabel="Seleccione Opción" itemValue="" />
+											<f:selectItem itemLabel="Xbox One" itemValue="Xbox One" />
+											<f:selectItem itemLabel="PS4" itemValue="PS4" />
+											<f:selectItem itemLabel="Wii U" itemValue="Wii U" />
+											<f:facet name="footer">
+												<p:separator />
+												<h:outputText value="3 consoles" style="font-weight:bold;" />
+											</f:facet>
+										</p:selectOneMenu>
+									</div>
+									<!-- 						</div> -->
+
+									<!-- 						<div class="form-group" > -->
+									<h:outputLabel class="col-md-1 control-label ui-outputlabel" value="Periodo:" />
+									<div class="col-md-3">
+										<p:selectOneMenu id="slctOnMenPeriodo" value="#" style="width: 100%">
+											<f:selectItem itemLabel="Select One" itemValue="" />
+											<f:selectItem itemLabel="Xbox One" itemValue="Xbox One" />
+											<f:selectItem itemLabel="PS4" itemValue="PS4" />
+											<f:selectItem itemLabel="Wii U" itemValue="Wii U" />
+											<f:facet name="footer">
+												<p:separator />
+												<h:outputText value="3 consoles" style="font-weight:bold;" />
+											</f:facet>
+										</p:selectOneMenu>
+									</div>
+
+									<div class="col-md-2">
+										<h:button class="btn btn-primary" value="Seleccionar" />
+									</div>
+
+								</div>
+
+							</h:form>
+
+
+							<p:separator />
+
+							<!-- 		CARGA Y DESCARGA DE XLS 		-->
+							<h:form>
+								<div class="row">
+								
+									<div class="col-md-6 text-left">
+										<h:commandLink id="cmlnkDonwXls"
+											styleClass="btn btn-success btn-sm"
+											actionListener="#{registroComprasController.descargarPlantillaExcel()}">
+											<i class="fa fa-download"> </i>
+												<span>Descargar Plantilla</span>
+											<p:fileDownload value="#" />
+										</h:commandLink>
+									</div>
+									
+									
+									<div class="col-md-6 text-right">
+										<p:fileUpload id="flupldXls" 
+													  skinSimple="true"
+													  label="Importar desde Excel" 
+													  dragDropSupport="false"
+													  multiple="false" 
+													  auto="true" 
+													  oncomplete="cargarEventos()" 
+													  styleClass=" btn  btn-lg btn-outline-primary"
+													  onstart="PF('pbAjaxLong').start();">
+											<!--  componente copiar pegar js excel-->
+											<div id='converter'>
+												<input  id="txtCopyExcel" 
+														type="text" 
+														autocomplete="off"
+														style="text-align: center" 
+														placeholder="Pegar Aqui" />
+											</div>
+
+											<!--  fin componente copiar pegar js -->
+										</p:fileUpload>
+									</div>
+									
+								</div>
+							</h:form>
+
+							<br /> <br />
+							
+							<!-- 		CARGA INDIVIDUAL 		-->
+							<h:form id="frmCompras">
+
+								<p:dataTable 	id="dtCompras" 
+												emptyMessage="Sin registros"
+												widgetVar="dtWgCompra" 
+												var="compra" 
+												paginator="true"
+												styleClass="table table-striped table-borderedtable-hovertable-sm"
+												paginatorPosition="bottom"
+												paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+												currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} facturas"
+												rowsPerPageTemplate="20,30" 
+												rowIndexVar="rowIndex" 
+												rows="20"
+												value="#{registroComprasNotasModel.misFacturas}">
+												
+									<p:column headerText="Nº" style="width:auto; text-align: center">
+										<p:outputLabel value="#{rowIndex}" style="width:100%" />
+									</p:column>
+									
+									<p:column headerText="Fecha Factura"
+										style="auto; text-align: center">
+										
+									</p:column>
+									
+									<p:column headerText="N° de Factura del"
+										style="width: auto; text-align: center">
+										
+									</p:column>
+									
+									<p:column headerText="N° de Factura al"
+										style="width: auto; text-align: center">
+										
+									</p:column>
+									
+									<p:column headerText="N° Autorizacion/CUF"
+										style="width: auto; text-align: center">
+										
+									</p:column>
+									
+									<p:column headerText="Importe Total Facturas Agrupadas"
+										style="width: auto; text-align: center">
+										
+									</p:column>
+									<p:column headerText="Estado"
+										style="width: auto; text-align: center">
+										
+									</p:column>
+									
+								</p:dataTable>
+
+
+
+							</h:form>
+
+						</div>
+
+
+
+
+
+						<!-- 	CONTENT-PAGE	 -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<!-- 		<h:outputScript library="js" name="jquery-3.3.1.min.js" /> -->
+		<!-- 		<h:outputScript library="js" name="compras/imask.js" /> -->
+		<!-- 		<h:outputScript library="js" name="ajv.bundle.js" /> -->
+		<!-- 		<h:outputScript library="js" name="ajv.min.js" /> -->
+		<!-- 		<h:outputScript library="js" name="localize_es.js" /> -->
+		<!-- 		<h:outputScript library="js" name="xlsx.full.min.js" /> -->
+		<!-- 		<h:outputScript library="js" name="compras/validadorJsonEsquema.js" /> -->
+
+
+	</ui:define>
+</ui:composition>

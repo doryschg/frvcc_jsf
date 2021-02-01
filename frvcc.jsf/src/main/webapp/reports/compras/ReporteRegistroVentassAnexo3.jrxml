@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SolicitudAutorizacionImprenta" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="94a85b61-bab1-44f7-924f-9d6655e1d284">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.report.description" value="Reporte de Solicitud para Contribuyente"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<subDataset name="ItemDataSet" uuid="09461fcd-bdcd-43b9-94fc-84ddec516764">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="fechaRegistro" class="java.util.Date"/>
+		<field name="tallerEquipoId" class="java.lang.Long"/>
+		<field name="direccionTaller" class="java.lang.String"/>
+		<field name="marcaImprenta" class="java.lang.String"/>
+		<field name="descripcionTipoImpresion" class="java.lang.String"/>
+		<field name="nroSerie" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="nitSolicitante" class="java.lang.Long"/>
+	<parameter name="razonSocial" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{razonSocial}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="logoPath" class="java.lang.String"/>
+	<parameter name="codigoSeguridad" class="java.lang.String"/>
+	<parameter name="administracion" class="java.lang.String"/>
+	<parameter name="fechaGeneracion" class="java.sql.Timestamp"/>
+	<parameter name="usuarioGenerador" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="periodo" class="java.lang.Integer"/>
+	<field name="gestion" class="java.lang.Integer"/>
+	<field name="totalVentasLinea" class="java.lang.Long"/>
+	<field name="importeBaseDebito" class="java.lang.Long"/>
+	<field name="totalDebitoFiscal" class="java.lang.Long"/>
+	<field name="totalFacturasAnuladas" class="java.lang.Long"/>
+	<field name="totalFacturasEmitidas" class="java.lang.Long"/>
+	<variable name="nro" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{nro}+1]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="152">
+			<staticText>
+				<reportElement x="454" y="39" width="117" height="13" uuid="6ab1c010-1ab2-4e60-8d5a-4d30bfaad075"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="133" y="0" width="321" height="52" uuid="9ab74e90-ca29-41fb-af4a-3ff6f27a430a">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ANEXO 3
+
+REGISTRO DE VENTAS EN LÍNEA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="1" y="55" width="571" height="19" forecolor="#FFFFFF" backcolor="#545454" uuid="fa27fca6-cce8-4dcb-be89-6bedd4cdd271"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATOS CONTRIBUYENTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="76" width="240" height="15" forecolor="#002C5A" uuid="9da7193d-4acf-400d-85c5-98c5686ef97a">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NIT:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="250" y="76" width="321" height="15" uuid="662662fe-11de-4af1-8487-cbef7a95ce3c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$P{nitSolicitante}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="93" width="240" height="15" forecolor="#002C5A" uuid="f276d037-af32-4777-8929-b1ba8649ed33">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RAZÓN SOCIAL]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="250" y="93" width="321" height="15" uuid="5b3312a7-387d-49d2-9b6f-3a54cfda895c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$P{razonSocial}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="454" y="0" width="117" height="13" uuid="c9baf23d-cc98-4f22-9240-27c93656695e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usuario:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="454" y="26" width="117" height="13" uuid="99372f98-68f6-4bdf-b413-bbf4a1cfb661"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha generación:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="454" y="13" width="117" height="13" uuid="e0bc17c3-9f75-4eca-aad5-07e4263d4370"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="133" height="52" uuid="b280bfcf-2388-4be6-8c8f-fcba6fde7908">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="110" width="240" height="15" forecolor="#002C5A" uuid="3bdd6cb9-2c5e-42b7-a788-ed9fedb0a603">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ADMINISTRACIÓN]]></text>
+			</staticText>
+			<image onErrorType="Blank">
+				<reportElement x="40" y="2" width="50" height="50" uuid="3c0bc4f8-de8a-4012-9ff7-4f3ccca2244e"/>
+				<imageExpression><![CDATA[$P{logoPath}]]></imageExpression>
+			</image>
+			<textField textAdjust="StretchHeight" pattern="dd/MM/yyyy">
+				<reportElement x="250" y="110" width="321" height="14" uuid="b1466497-381c-4b6b-a937-1b88b9e0c0ec">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$P{administracion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="1" y="128" width="571" height="19" forecolor="#FFFFFF" backcolor="#545454" uuid="d424bb23-70a3-4c3e-85eb-5f72ec1e86cd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INFORMACION DE COMPRAS DEL PERIODO]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="452" y="14" width="119" height="13" uuid="b6c70709-3f71-4cfa-86e8-dd80df6c614a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{usuarioGenerador}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="41" width="110" height="13" uuid="056ce6ab-869f-4cd0-8c81-51b2801130c3">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fechaGeneracion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="129">
+			<textField textAdjust="StretchHeight">
+				<reportElement x="250" y="20" width="321" height="15" uuid="eb781c4f-5e6f-4a0c-8f32-f51e0b083421">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{gestion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="56" width="240" height="15" forecolor="#002C5A" uuid="be4ec091-c3ce-4244-ba33-873cbd7e921c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IMPORTE BASE PARA DÉBITO FISCAL]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="250" y="3" width="321" height="15" uuid="c645ef73-94b4-435a-9532-f89b981b3862">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{periodo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="39" width="240" height="15" forecolor="#002C5A" uuid="139845c5-a4b6-40ea-9dc6-6068fe84ce3c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL VENTAS EN LÍNEA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="3" width="240" height="15" forecolor="#002C5A" uuid="025f9350-f0dc-4814-bbda-e2aff1918929">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERÍODO]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="250" y="39" width="321" height="15" uuid="9063c63e-3eaf-4513-a55f-3f5edbd5ba1e">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{totalVentasLinea}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="21" width="240" height="15" forecolor="#002C5A" uuid="89caf2d4-91c4-4687-b45e-3af9a170fa48">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GESTIÓN]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="250" y="56" width="321" height="15" uuid="33041a27-0852-42b5-bc0d-48be0cbcedb9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{importeBaseDebito}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="251" y="92" width="321" height="15" uuid="16e74d7b-52c4-4969-9cdb-8ff47b4d657c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{totalFacturasAnuladas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="92" width="240" height="15" forecolor="#002C5A" uuid="552fb6d4-ff73-40f4-96f6-6d89ea7f6f29">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CANTIDAD DE FACTURAS ANULADAS EN LÍNEA]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="251" y="109" width="321" height="15" uuid="9ad93da9-6c8f-4ded-8ba4-c267af27a65e">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{totalFacturasEmitidas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="109" width="240" height="15" forecolor="#002C5A" uuid="9ef145b7-e0a6-4177-9873-03f75472a12f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CANTIDAD DE FACTURAS EMITIDAS EN LÍNEA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="75" width="240" height="15" forecolor="#002C5A" uuid="8ee28521-2e29-46c3-a92f-345edb5bab73">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL DÉBITO FISCAL]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" pattern="">
+				<reportElement x="251" y="75" width="321" height="15" uuid="a3aedfad-b0cc-4425-bd83-983d4e41966d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  :   "+$F{totalDebitoFiscal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band height="23">
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="126" height="19" uuid="5bf75b7d-face-4a44-a5dd-b0b63914b376">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código de Seguridad : ]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="126" y="2" width="392" height="19" uuid="f0277c86-1d85-4158-943e-572e00985897"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{codigoSeguridad}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

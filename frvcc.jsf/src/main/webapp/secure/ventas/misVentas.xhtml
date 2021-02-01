@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/common/templateNoAuth.xhtml"
+	xmlns:ldc="http://example.com/LocalDateConverter"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:w="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:visor="http://java.sun.com/jsf/composite/visor"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:params="bo.gob.sin.sre.fac.frvcc.jsf.parametros.ParametrosFRVCC">
+
+	<!-- 	<f:metadata> -->
+	<!-- 				<f:viewAction action="{logedBean.check}" /> -->
+	<!-- 	</f:metadata> -->
+
+	<ui:define name="title">MIS VENTAS</ui:define>
+
+	<!-- CONTENT -->
+	<ui:define name="body">
+
+		<h:form id="frmBusqueda">
+			<script type="text/javascript">
+		function abrirVisorReporte() {
+			if (document.getElementById('frmBusqueda:comBuscador:btnVisorPdf:btnVisorPdf') != undefined) {
+			document.getElementById('frmBusqueda:comBuscador:btnVisorPdf:btnVisorPdf').click();
+			}				
+		}	
+	</script>
+			<p:panel header="Buscar Ventas" toggleable="true" id="idBusqueda"
+				styleClass="card box-primary ui-fluid">
+				<p:panelGrid id="pnlCriterios" columns="6"
+					columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2"
+					layout="grid" styleClass="ui-flui d">
+					<p:outputLabel value="Gestión: " />
+					<p:selectOneMenu value="#{misVentasController.gestion}"
+						id="txtGestion">
+						<f:selectItems
+							value="#{of:createIntegerArray(of:formatDate(now,'yyyy'),of:formatDate(now,'yyyy')-(of:formatDate(now,'yyyy')-2016))}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Periodo: " />
+					<p:selectOneMenu value="#{misVentasController.periodo}"
+						id="txtPeriodo">
+						<f:selectItem itemValue="#{null}" itemLabel="Seleccionar" />
+						<f:selectItem itemValue="1" itemLabel="ENERO" />
+						<f:selectItem itemValue="2" itemLabel="FEBRERO" />
+						<f:selectItem itemValue="3" itemLabel="MARZO" />
+						<f:selectItem itemValue="4" itemLabel="ABRIL" />
+						<f:selectItem itemValue="5" itemLabel="MAYO" />
+						<f:selectItem itemValue="6" itemLabel="JUNIO" />
+						<f:selectItem itemValue="7" itemLabel="JULIO" />
+						<f:selectItem itemValue="8" itemLabel="AGOSTO" />
+						<f:selectItem itemValue="9" itemLabel="SEPTIEMBRE" />
+						<f:selectItem itemValue="10" itemLabel="OCTUBRE" />
+						<f:selectItem itemValue="11" itemLabel="NOVIEMBRE" />
+						<f:selectItem itemValue="12" itemLabel="DICIEMBRE" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Estado Uso:" />
+					<p:row>
+						<p:selectOneMenu id="ddlEstadoUso"
+							value="#{misVentasController.estadoUsoId}">
+							<f:selectItem itemLabel="Seleccionar" itemValue="" />
+							<f:selectItem itemLabel="REGISTRADO" itemValue="REG" />
+							<f:selectItem itemLabel="SELECCIONADO" itemValue="ASC" />
+							<f:selectItem itemLabel="DECLARADO" itemValue="DEC" />
+							<f:selectItem itemLabel="ACEPTADO" itemValue="CON" />
+							<f:ajax event="change" process="@this" update="ddlEstadoUso">
+							</f:ajax>
+						</p:selectOneMenu>
+					</p:row>
+					<p:outputLabel value="Modalidad Factura:" />
+					<p:row>
+						<p:selectOneMenu id="ddlModalidad"
+							value="#{misVentasController.modalidad}">
+							<f:selectItem itemLabel="Seleccionar" itemValue="" />
+							<f:selectItem itemLabel="ELECTRÓNICA EN LINEA" itemValue="LIN" />
+							<f:selectItem itemLabel="ELECTRÓNICA" itemValue="ELE" />
+							<f:selectItem itemLabel="ELECTRÓNICA CICLOS" itemValue="CIC" />
+							<f:selectItem itemLabel="COMPUTARIZADA" itemValue="CMP" />
+							<f:selectItem itemLabel="PREVALORADA" itemValue="PRE" />
+							<f:selectItem itemLabel="MANUAL" itemValue="MAN" />
+							<f:ajax event="change" process="@this" update="ddlModalidad">
+							</f:ajax>
+						</p:selectOneMenu>
+					</p:row>
+					<p:outputLabel value="Con Débito Fiscal:" />
+					<p:row>
+						<p:selectOneMenu id="ddlconDerecho"
+							value="#{misVentasController.conDerechoCf}">
+							<f:selectItem itemLabel="Seleccionar" itemValue="" />
+							<f:selectItem itemLabel="SI" itemValue="SI" />
+							<f:selectItem itemLabel="NO" itemValue="NO" />
+							<f:ajax event="change" process="@this" update="ddlconDerecho">
+							</f:ajax>
+						</p:selectOneMenu>
+					</p:row>
+					<p:outputLabel value="Documento Cliente:" />
+					<p:row>
+						<p:inputText id="txtDocumentoCliente"
+							w:placeholder="Documento Cliente" maxlength="13" readonly="false"
+							validatorMessage="Debe seleccionar un valor"
+							requiredMessage="Campo requerido"
+							value="#{misVentasController.documentoCliente}"
+							converterMessage="Debe ser un número Válido">
+							<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+							<p:clientValidator event="blur" />
+							<p:clientValidator event="keyup" />
+						</p:inputText>
+						<p:message for="txtDocumentoCliente"></p:message>
+					</p:row>
+					<p:outputLabel value="N° Factura:" />
+					<p:row>
+						<p:inputText id="txtNroFactura" w:placeholder="N° Factura"
+							maxlength="13" readonly="false"
+							validatorMessage="Debe seleccionar un valor"
+							requiredMessage="Campo requerido"
+							value="#{misVentasController.nroFactura}"
+							converterMessage="Debe ser un número Válido">
+							<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+							<p:clientValidator event="blur" />
+							<p:clientValidator event="keyup" />
+						</p:inputText>
+						<p:message for="txtNroFactura"></p:message>
+					</p:row>
+					<p:outputLabel value="Fecha Emisión:" />
+					<p:row>
+						<p:calendar value="#{misVentasController.fechaFactura}"
+							id="txtFechaEmision" showOn="button" pattern="dd/MM/yyyy"
+							locale="es" mask="99/99/9999" maxdate="to_day">
+							<f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+						</p:calendar>
+					</p:row>
+					<p:commandButton id="idBuscar" value="Buscar" icon="fa fa-search"
+						styleClass="btn btn-primary btn-sm"
+						actionListener="#{misVentasController.onBuscar}"
+						update="@([id$=idBusqueda])"
+						process="@this txtGestion ddlModalidad ddlconDerecho txtPeriodo ddlEstadoUso txtDocumentoCliente txtFechaEmision txtNroFactura">
+					</p:commandButton>
+					<p:commandButton id="idLimpiar" value="Limpiar"
+						styleClass="btn btn-warning btn-sm" process="@this"
+						actionListener="#{misVentasController.onLimpiar}"
+						update="pnlCriterios dtFacturas pnlBotones">
+					</p:commandButton>
+
+				</p:panelGrid>
+				<p:separator />
+				<p:dataTable id="dtFacturas" emptyMessage="Sin registros"
+					var="factura" paginator="true" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} facturas"
+					rowsPerPageTemplate="10,20,30" rowIndexVar="rowIndex" rows="20"
+					paginatorPosition="bottom" rowKey="#{factura.id}" sortMode="single"
+					value="#{misVentasController.facturasLazy}" editable="true">
+					<p:ajax event="rowEdit"
+						listener="#{misVentasController.editarCamposCompras(factura)}"
+						update="dtFacturas" process="@this"
+						onstart="$('.ui-row-editor span.ui-icon-pencil').each(function(){$(this).show()});" />
+					<p:ajax event="rowEditCancel"
+						listener="#{misVentasController.cancelarEdicionCamposCompras(factura)}"
+						update="dtFacturas"
+						onstart="$('.ui-row-editor span.ui-icon-pencil').each(function(){$(this).show()});" />
+
+					<p:column style="width:2%;text-align: rigth">
+						<f:facet name="header">
+							<h:outputText value="N°"></h:outputText>
+						</f:facet>
+						<h:outputText value="#{rowIndex+1}"></h:outputText>
+					</p:column>
+
+					<p:column headerText="N° Factura" style="width:10%;">
+						<h:outputText value="#{factura.numeroFactura}" style="float:right" />
+					</p:column>
+					<p:column headerText="N° Autorización / CUF" style="width:8%">
+						<h:outputText value="#{factura.codigoAutorizacion}"
+							style="text-align: rigth;" />
+					</p:column>
+					<p:column headerText="Fecha Emisión" style="width:15%">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{factura.fechaFactura}">
+									<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<p:inputMask id="txtFechaEmision" required="true"
+									value="#{factura.fechaFactura}" mask="99/99/9999"
+									requiredMessage="Fecha emision dato requerido"
+									styleClass="ui-fluid" converterMessage="Formato incorrecto">
+									<ldc:convertLocalDate type="both" pattern="dd/MM/yyyy" />
+									<p:message id="mfecha" for="txtFechaEmision"></p:message>
+								</p:inputMask>
+								<p:watermark value="dd/MM/yyyy" for="txtFechaEmision" />
+
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Importe Total" style="width:10%;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText style="float:right"
+									value="#{factura.importeTotalVenta}">
+									<f:convertNumber locale="en-US" pattern="#,##0.00" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+
+								<p:inputNumber id="txtMontoTotal" maxValue="999999999999999.99"
+									decimalPlaces="2" thousandSeparator="," decimalSeparator="."
+									minValue="0.00" value="#{factura.importeTotalVenta}">
+									<p:message id="mImporteTotal" for="txtMontoTotal">
+									</p:message>
+
+								</p:inputNumber>
+								<p:keyFilter for="txtMontoTotal" regEx="/[\d]/" />
+
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Importe Débito Fiscal" style="width:10%;">
+
+						<h:outputText style="float:right" value="#{factura.importeBaseDf}">
+							<f:convertNumber locale="en-US" pattern="#,##0.00" />
+						</h:outputText>
+
+					</p:column>
+
+					<p:column headerText="Código Control" style="width:15%;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{factura.codigoControl}">
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<p:inputMask id="txtCodControl" value="#{factura.codigoControl}"
+									mask="**-**-**-**?-**"
+									readonly="#{factura.modalidadId=='MAN' or 
+									factura.modalidadId=='FCL' or factura.modalidadId=='FPW' or factura.modalidadId=='FEL' 
+									or factura.modalidadId=='FEL' or factura.modalidadId=='PRE'}">
+								</p:inputMask>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Documento Cliente" style="width:2%">
+						<h:outputText value="#{factura.numeroDocumentoCliente}"
+							style="width:100%" />
+					</p:column>
+
+					<p:column headerText="Cliente" style="width:2%">
+						<h:outputText value="#{factura.nombreCliente}" style="width:100%" />
+					</p:column>
+
+					<p:column headerText="Estado" style="width:5%; text-align: center">
+						<!-- 						<h:outputText -->
+						<!-- 							value="#{clasificadorController.descripcionEstadoUsoCompraByCodigo(factura.estadoUsoId)}" /> -->
+					</p:column>
+
+					<p:column headerText="Acciones"
+						style="width:5%; text-align: center">
+						<!-- 						<p:rowEditor -->
+						<!-- 							rendered="#{factura.estadoUsoId == 'REG' and (factura.origenId =='APL' or factura.origenId =='MOB')  -->
+						<!-- 				and factura.ventaId==null}" /> -->
+						<p:commandLink
+							actionListener="#{misVentasController.eliminarCompra(factura)}"
+							process="@this"
+							rendered="#{factura.estadoVentaId != 'ANL'}"
+							update="dtFacturas">
+							<span class="fa fa-trash" title="Eliminar"> </span>
+							<p:confirm header="Confirmar"
+								message="¿Está seguro que desea eliminar la factura seleccionada?"
+								icon="ui-icon-alert" />
+						</p:commandLink>
+						<p:confirmDialog global="true" showEffect="fade" responsive="true"
+							position="center center">
+							<p:commandButton value="Si"
+								styleClass="ui-confirmdialog-yes btn-primary btn-sm"
+								icon="fa fa-check" />
+							<p:commandButton value="No"
+								styleClass="ui-confirmdialog-no btn-warning btn-sm"
+								icon="fa fa-close" />
+						</p:confirmDialog>
+					</p:column>
+
+				</p:dataTable>
+				<p:panelGrid id="pnlBotones" columns="6"
+					columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2"
+					layout="grid" styleClass="ui-fluid">
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<p:spacer />
+					<!-- 					<p:commandButton ajax="false" title="Descargar" -->
+					<!-- 						value="Descargar Consulta Excel" -->
+					<!-- 						actionListener="#{misVentasController.ExcelComprasConsultadas()}" -->
+					<!-- 						icon="fa fa-fw fa-download" styleClass="btn btn-success btn-sm" -->
+					<!-- 						id="btnDownloadExcel" -->
+					<!-- 						rendered="#{misVentasController.consultaRealizada}"> -->
+					<!-- 						<p:fileDownload value="#{misVentasController.download}" /> -->
+					<!-- 					</p:commandButton> -->
+				</p:panelGrid>
+
+			</p:panel>
+			<p:panel visible="false">
+				<visor:visorPdf nombreWidgetVar="idFormularioInscripcionDlg"
+					icon="fa  fa-print" esVisibleBoton="true"
+					archivoB64="#{misVentasController.reportesController.respuestaBase64}"
+					id="btnVisorPdf">
+				</visor:visorPdf>
+			</p:panel>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
